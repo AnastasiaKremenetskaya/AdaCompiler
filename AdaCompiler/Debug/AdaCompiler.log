@@ -1,0 +1,6 @@
+﻿  Process "lexer.l" flex file
+  lexer.flex.cpp
+C:\Users\lucky\source\repos\vstu\translation\AdaCompiler\AdaCompiler\lexer.l(108,10): warning C4477: "printf": в строке форматирования "%d" требуется аргумент типа "int", но вариативный аргумент "1" имеет тип "char *"
+C:\Users\lucky\source\repos\vstu\translation\AdaCompiler\AdaCompiler\lexer.l(109,10): warning C4477: "printf": в строке форматирования "%d" требуется аргумент типа "int", но вариативный аргумент "1" имеет тип "char *"
+C:\Users\lucky\source\repos\vstu\translation\AdaCompiler\AdaCompiler\lexer.l(166): warning C4715: fileOpen: значение возвращается не при всех путях выполнения
+  AdaCompiler.vcxproj -> C:\Users\lucky\source\repos\vstu\translation\AdaCompiler\Debug\AdaCompiler.exe
