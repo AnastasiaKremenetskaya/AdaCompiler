@@ -1,0 +1,163 @@
+Found a keyword 'procedure' in line 1
+Found an identifier 'your_name' in line 1
+Found a keyword 'is' in line 1
+Found a keyword 'procedure' in line 2
+Found an identifier 'test' in line 2
+Found a keyword 'is' in line 2
+Found a keyword 'begin' in line 3
+Found a keyword 'null' in line 4
+Found a delimiter ';' in line 4
+Found a keyword 'end' in line 5
+Found an identifier 'Test' in line 5
+Found a delimiter ';' in line 5
+Found an identifier 'number' in line 7
+Found a delimiter ':' in line 7
+Found a type 'Integer' in line 7
+Found an assignment operator ':=' in line 7
+Found a integer value '5' in line 7
+Found a delimiter ';' in line 7
+Found an identifier 'symbol' in line 8
+Found a delimiter ':' in line 8
+Found a type 'Character' in line 8
+Found an assignment operator ':=' in line 8
+Found a character value 'h' in line 8
+Found a delimiter ';' in line 8
+Found an identifier 'pi' in line 9
+Found a delimiter ':' in line 9
+Found a type 'Float' in line 9
+Found an assignment operator ':=' in line 9
+Found a float value '3.140000' in line 9
+Found a delimiter ';' in line 9
+Found an identifier 'str_arr' in line 10
+Found a delimiter ':' in line 10
+Found a type 'string' in line 10
+Found a delimiter '(' in line 10
+Found a integer value '1' in line 10
+Found a range operation '..' in line 10
+Found a integer value '100' in line 10
+Found a delimiter ')' in line 10
+Found a delimiter ';' in line 10
+Found an identifier 'num_arr' in line 11
+Found a delimiter ':' in line 11
+Found a type 'array' in line 11
+Found a delimiter '(' in line 11
+Found a integer value '1' in line 11
+Found a range operation '..' in line 11
+Found a integer value '5' in line 11
+Found a delimiter ')' in line 11
+Found an identifier 'of' in line 11
+Found a type 'Integer' in line 11
+Found a delimiter ';' in line 11
+Found an identifier 'str' in line 12
+Found a delimiter ':' in line 12
+Found a type 'string' in line 12
+Found an assignment operator ':=' in line 12
+Found a string value 'asdsfsd"dsads"' in line 12
+Found a delimiter ';' in line 12
+Found an identifier 'number2' in line 13
+Found a delimiter ':' in line 13
+Found a type 'Integer' in line 13
+Found a delimiter ';' in line 13
+Found an identifier 'len' in line 14
+Found a delimiter ':' in line 14
+Found a type 'Integer' in line 14
+Found an assignment operator ':=' in line 14
+Found a integer value '0' in line 14
+Found a delimiter ';' in line 14
+Found a keyword 'begin' in line 15
+Found an identifier 'number2' in line 16
+Found an assignment operator ':=' in line 16
+Found a integer value '5' in line 16
+Found a delimiter ';' in line 16
+Found an identifier 'pi' in line 17
+Found an assignment operator ':=' in line 17
+Found an exponent value '5.500000e+07' in line 17
+Found an arithmetical operation '+' in line 17
+Found a float value '3.300000' in line 17
+Found a delimiter ';' in line 17
+Found a delimiter ';' in line 17
+Found an identifier 'pi' in line 18
+Found an assignment operator ':=' in line 18
+Found an exponent value '5.500000e+03' in line 18
+Found a float value '0.300000' in line 18
+Found a delimiter ';' in line 18
+Found an identifier 'len' in line 19
+Found an assignment operator ':=' in line 19
+Found an identifier 'num_arr' in line 19
+Found an array attribyte ''Length' in line 19
+Found a delimiter ';' in line 19
+Found an identifier 'put' in line 21
+Found a delimiter '(' in line 21
+Found a string value 'function's"" parameters' in line 21
+Found a delimiter ')' in line 21
+Found a delimiter ';' in line 21
+Found single line comment in line 21
+Found a keyword 'for' in line 23
+Found an identifier 'i' in line 23
+Found a keyword 'in' in line 23
+Found a integer value '1' in line 23
+Found a range operation '..' in line 23
+Found a integer value '10' in line 23
+Found a keyword 'loop' in line 23
+Found an identifier 'put_line' in line 24
+Found a delimiter '(' in line 24
+Found a string value 'Hello, world!--Put_Line' in line 24
+Found a string operation '&' in line 24
+Found a character value '"' in line 24
+Found a string operation '&' in line 24
+Found a string value ''' in line 24
+Found a delimiter ')' in line 24
+Found a delimiter ';' in line 24
+Found a keyword 'end' in line 25
+Found a keyword 'loop' in line 25
+Found a delimiter ';' in line 25
+Found a keyword 'for' in line 27
+Found an identifier 'i' in line 27
+Found a keyword 'in' in line 27
+Found an identifier 'str' in line 27
+Found an array attribyte ''Range' in line 27
+Found a keyword 'loop' in line 27
+Found a keyword 'null' in line 28
+Found a delimiter ';' in line 28
+Found a keyword 'end' in line 29
+Found a keyword 'loop' in line 29
+Found a delimiter ';' in line 29
+Found a keyword 'if' in line 31
+Found an identifier 'number' in line 31
+Found a comparison operator '<' in line 31
+Found a float value '0.180000' in line 31
+Found a keyword 'then' in line 31
+Found an identifier 'number2' in line 32
+Found an assignment operator ':=' in line 32
+Found an identifier 'number' in line 32
+Found an arithmetical operation '+' in line 32
+Found a integer value '1' in line 32
+Found a delimiter ';' in line 32
+Found a keyword 'elsif' in line 33
+Found an identifier 'number' in line 33
+Found a comparison operator '>=' in line 33
+Found a integer value '60' in line 33
+Found a keyword 'then' in line 33
+Found an identifier 'number2' in line 34
+Found an assignment operator ':=' in line 34
+Found a integer value '4' in line 34
+Found an arithmetical operation '/' in line 34
+Found a integer value '2' in line 34
+Found a delimiter ';' in line 34
+Found an identifier 'else' in line 35
+Found an identifier 'number2' in line 36
+Found an assignment operator ':=' in line 36
+Found a integer value '4' in line 36
+Found an arithmetical operation '**' in line 36
+Found a integer value '2' in line 36
+Found a delimiter ';' in line 36
+Found a keyword 'end' in line 37
+Found a keyword 'if' in line 37
+Found a delimiter ';' in line 37
+Found an identifier 'Func' in line 39
+Found a delimiter ';' in line 39
+Found a keyword 'return' in line 41
+Found a delimiter ';' in line 41
+Found a keyword 'end' in line 42
+Found an identifier 'your_name' in line 42
+Found a delimiter ';' in line 42
