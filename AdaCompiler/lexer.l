@@ -3,6 +3,8 @@
 	#include <stdio.h>
 	#include <string.h>
 	#include <conio.h>
+	#include "ada_bison_tab.h"
+	extern int yyparse(void)
 %}
 
 %option noyywrap
@@ -120,8 +122,6 @@ false			{ printf("Found a boolean value '%d' in line %d\n", yytext, yylineno); }
 
 %%
 
-FILE* fileOpen(int iter, const char* fname, const char* fprefix, const char key);
-
 int main()
 {
 	int iterator = 0;
@@ -131,7 +131,7 @@ int main()
 	while(yyin = fileOpen(iterator, infname, ".adb", 'r'))
 	{
 		fileOpen(iterator, outfname, ".txt", 'w');
-		yylex();
+		yyparse();
 		fclose (yyin);
 		
 		++iterator;

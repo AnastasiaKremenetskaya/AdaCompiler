@@ -20,11 +20,42 @@
     </Flex>
   </ItemGroup>
   <ItemGroup>
-    <None Include="in\test0.adb" />
+    <ClInclude Include="ada_bison_tab.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Downloads\lab3_2\lab3\ada_bison_tab.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="tree_nodes.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lexer.flex.cpp">
+    <Bison Include="..\..\..\..\Downloads\ada_bison.y">
+      <Filter>Исходные файлы</Filter>
+    </Bison>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Downloads\lab3_2\lab3\lex.yy.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="ada_bison_tab.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ada_bison.output" />
+    <None Include="bison.bat">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="gccBison.bat">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="run_bison.bat">
+      <Filter>Исходные файлы</Filter>
+    </None>
+    <None Include="out\graph.bat">
+      <Filter>Исходные файлы</Filter>
+    </None>
   </ItemGroup>
 </Project>

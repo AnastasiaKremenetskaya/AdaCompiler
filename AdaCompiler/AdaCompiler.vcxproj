@@ -94,6 +94,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Flex />
+    <Bison />
+    <Bison>
+      <AdditionalOptions>start /B /WAIT /D "C:\Users\VS\source\repos\AdaCompiler\win_flex_bison\" win_bison.exe --output="%(Filename).tab.cpp" --defines="%(Filename).tab.h"  "%(Filename)%(Extension)"
+exit /b %errorlevel% %(AdditionalOptions)</AdditionalOptions>
+    </Bison>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -110,6 +116,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Flex />
+    <Bison />
+    <Bison>
+      <AdditionalOptions>start /B /WAIT /D "C:\Users\VS\source\repos\AdaCompiler\win_flex_bison\" win_bison.exe --output="%(Filename).tab.cpp" --defines="%(Filename).tab.h"  "%(Filename)%(Extension)"
+exit /b %errorlevel% %(AdditionalOptions)</AdditionalOptions>
+    </Bison>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -122,6 +134,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Flex />
+    <Bison />
+    <Bison>
+      <AdditionalOptions>start /B /WAIT /D "C:\Users\VS\source\repos\AdaCompiler\win_flex_bison\" win_bison.exe --output="%(Filename).tab.cpp" --defines="%(Filename).tab.h"  "%(Filename)%(Extension)"
+exit /b %errorlevel% %(AdditionalOptions)</AdditionalOptions>
+    </Bison>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -138,17 +156,40 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Flex />
+    <Bison />
+    <Bison>
+      <AdditionalOptions>start /B /WAIT /D "C:\Users\VS\source\repos\AdaCompiler\win_flex_bison\" win_bison.exe --output="%(Filename).tab.cpp" --defines="%(Filename).tab.h"  "%(Filename)%(Extension)"
+exit /b %errorlevel% %(AdditionalOptions)</AdditionalOptions>
+    </Bison>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Flex Include="lexer.l">
       <FileType>Document</FileType>
+      <Wincompat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</Wincompat>
+      <Wincompat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</Wincompat>
+      <Wincompat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</Wincompat>
+      <Wincompat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</Wincompat>
     </Flex>
   </ItemGroup>
   <ItemGroup>
-    <None Include="in\test0.adb" />
+    <ClInclude Include="..\..\..\..\Downloads\lab3_2\lab3\ada_bison_tab.h" />
+    <ClInclude Include="ada_bison_tab.h" />
+    <ClInclude Include="tree_nodes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lexer.flex.cpp" />
+    <Bison Include="..\..\..\..\Downloads\ada_bison.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Downloads\lab3_2\lab3\lex.yy.c" />
+    <ClCompile Include="ada_bison_tab.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ada_bison.output" />
+    <None Include="bison.bat" />
+    <None Include="gccBison.bat" />
+    <None Include="out\graph.bat" />
+    <None Include="run_bison.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
