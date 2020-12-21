@@ -173,7 +173,6 @@ exit /b %errorlevel% %(AdditionalOptions)</AdditionalOptions>
     </Flex>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Downloads\lab3_2\lab3\ada_bison_tab.h" />
     <ClInclude Include="ada_bison_tab.h" />
     <ClInclude Include="tree_nodes.h" />
   </ItemGroup>

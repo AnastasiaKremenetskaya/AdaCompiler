@@ -23,9 +23,6 @@
     <ClInclude Include="ada_bison_tab.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Downloads\lab3_2\lab3\ada_bison_tab.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="tree_nodes.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>

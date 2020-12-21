@@ -1,6 +1,6 @@
 %{
     #include "tree_nodes.h"
-    #include "ada_bison_tab.h"
+    #include "grammar.tab.h"
     #include <stdlib.h>
     #include <stdio.h>
     #include <string.h>

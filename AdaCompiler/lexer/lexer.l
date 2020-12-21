@@ -3,7 +3,7 @@
 	#include <stdio.h>
 	#include <string.h>
 	#include <conio.h>
-	#include "ada_bison_tab.h"
+	#include "../parser/grammar.tab.h"
 	extern int yyparse(void)
 %}
 
