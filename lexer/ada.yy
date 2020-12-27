@@ -1,11 +1,20 @@
 %{
-    #include "tree_nodes.h"
-    #include "grammar.tab.h"
     #include <stdlib.h>
     #include <stdio.h>
     #include <string.h>
-    #include <conio.h>
-    #include <malloc.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <netinet/in.h>
+    #include <math.h>
+
+    #if defined(__MACH__)
+  	#include <stdlib.h>
+  	#else
+  	#include <malloc.h>
+  	#endif
+
+    #include "../parser/tree_nodes.h"
+    #include "grammar.tab.h"
 
     extern ProgramList *root;
     extern int yyparse(void);
@@ -132,6 +141,8 @@ struct Tree
 };
 
 FILE* fileOpen(int iter, const char* fname,const char* prefix, const char key);
+char* replaceWord(const char* s, const char* oldW, const char* newW);
+void itoa(int value, char* str, int base);
 
 void printTree(ProgramList *pr);
 char *expr_type_str(EXPR_TYPE et);
@@ -162,44 +173,30 @@ void parseIfStatement(IfStatement *prog, Tree *tree, int parentNum);
 void parseElse(ElseStatement *prog, Tree *tree, int parentNum);
 void parseElseIfStatementList(ElseIfStatementList *prog, Tree *tree, int parentNum);
 
-void main()
+int main(int argc,char* argv[])
 {
-    int iterator = 4;
-
-    const char* infname = "in\\test";
-    const char* outfname = "out\\output";
-
-    if( yyin = fileOpen(iterator, infname, ".adb", 'r') )
+    if (argc > 1)
     {
-		yyparse();
-		fclose (yyin);
+        yyin = fopen(argv[1], "r");
+        yyparse();
+        fclose (yyin);
 
-		fileOpen(iterator, outfname, ".txt", 'w');
-		printTree(root);
-		fclose (stdout);
+        char* outfilename = replaceWord(argv[1], "in", "out");
+        printf("Result is in: %s", outfilename);
+
+        FILE* output = freopen(outfilename, "w", stdout);
+        printTree(root);
+        fclose(stdout);
+
+
+        //output = fopen("constant_table.csv","w");
+        //fprintf(output, "%s", ";Constant table:;\n");
+        //create_table(root);
+        //st_print_const_file(output);
+        //printLocalVars_file(output);
+      //generate_byte_code();
     }
-}
-
-FILE* fileOpen(int iter, const char* fname,const char* prefix, const char key)
-{
-    char outname[51];
-    char fnum[7];
-
-    strcpy(outname, fname);
-    itoa(iter, fnum, 10);
-    strcat(outname, fnum);
-    strcat(outname, prefix);
-
-    switch(key)
-    {
-        case 'r':
-            return fopen(outname, "r");
-        break;
-
-        case 'w':
-            return freopen(outname, "w", stdout);
-        break;
-    }
+    return 0;
 }
 
 TreeUnit *newTreeUnit(int parentNum, const char *label, const char *edgeLabel)
@@ -691,4 +688,91 @@ void parseElseIfStatementList(ElseIfStatementList *prog, Tree *tree, int parentN
 			parseStatementList(ds->stmtList, tree, currentIter);
         }
     }
+}
+
+char* replaceWord(const char* s, const char* oldW, const char* newW)
+{
+    char* result;
+    int i, cnt = 0;
+    int newWlen = strlen(newW);
+    int oldWlen = strlen(oldW);
+
+    // Counting the number of times old word
+    // occur in the string
+    for (i = 0; s[i] != '\0'; i++) {
+        if (strstr(&s[i], oldW) == &s[i]) {
+            cnt++;
+
+            // Jumping to index after the old word.
+            i += oldWlen - 1;
+        }
+    }
+
+    // Making new string of enough length
+    result = (char*)malloc(i + cnt * (newWlen - oldWlen) + 1);
+
+    i = 0;
+    while (*s) {
+        // compare the substring with the result
+        if (strstr(s, oldW) == s) {
+            strcpy(&result[i], newW);
+            i += newWlen;
+            s += oldWlen;
+        }
+        else
+            result[i++] = *s++;
+    }
+
+    char *end = result + strlen(result);
+
+    while (end > result && *end != '.') {
+        --end;
+    }
+
+    if (end > result) {
+        *end = '\0';
+    }
+
+    strcat(result, ".txt");
+
+    return result;
+}
+
+void strreverse(char* begin, char* end) {
+
+	char aux;
+
+	while(end>begin)
+
+		aux=*end, *end--=*begin, *begin++=aux;
+
+}
+
+void itoa(int value, char* str, int base) {
+
+	static char num[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+	char* wstr=str;
+
+	int sign;
+
+	// Validate base
+
+	if (base<2 || base>35){ *wstr='\0'; return; }
+
+	// Take care of sign
+
+	if ((sign=value) < 0) value = -value;
+
+	// Conversion. Number is reversed.
+
+	do *wstr++ = num[value%base]; while(value/=base);
+
+	if(sign<0) *wstr++='-';
+
+	*wstr='\0';
+
+	// Reverse string
+	strreverse(str,wstr-1);
+
 }

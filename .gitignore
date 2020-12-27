@@ -395,3 +395,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 >>>>>>> 41caf09... first commit
+/.idea/
