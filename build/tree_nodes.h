@@ -1,3 +1,7 @@
+#pragma once
+
+typedef struct st_const STConst;
+
 typedef enum expression_type{ ET_INTEGER, ET_FLOAT, ET_STRING, ET_CHARACTER, ET_ID, ET_ARRAY_OR_FUNC, ET_BOOL,
 								ET_EQUAL, ET_NOT_EQUAL, ET_LESSER, ET_GREATER,ET_LESSER_EQUAL,ET_GREATER_EQUAL,
 								ET_PLUS, ET_MINUS, ET_CONCAT, ET_MULT, ET_DIV,
@@ -13,6 +17,7 @@ typedef enum declaration_type{DT_VARIABLE,DT_FUNCTION} DEC_TYPE;
 typedef union value value;
 typedef union stmtValue stmtValue;
 typedef union declarationStmt declarationStmt;
+
 typedef struct Expression Expression;
 typedef struct ExpressionList ExpressionList;
 typedef struct Statement Statement;
@@ -67,6 +72,11 @@ struct Expression
 	ExpressionList *exprList;//expression has expression list
 
 	Expression *nextInList;//expression is part of list
+
+	// Attributes
+    int constant_index;
+    Expression * origin;
+
 };
 
 struct AssigmentStatement
@@ -168,7 +178,7 @@ struct VariableDeclarationList
 	VariableDeclaration *end;
 };
 
-struct DeclarationStatement
+struct DeclarationStatement //functions are stored here
 {
 	DEC_TYPE type;
 
@@ -192,6 +202,16 @@ struct Program
 	VAR_TYPE returnType;
 
 	Program *nextInList;
+
+	// Attributes
+    //struct NVarType* vartype;
+
+    STConst * const_table;
+    STConst * const_last;
+    char * classname;
+    int methodref;
+    struct Program* pfunc;
+    struct ExpressionList* locals_list;
 };
 
 struct ProgramList

@@ -15,6 +15,7 @@
 
     #include "../parser/tree_nodes.h"
     #include "grammar.tab.h"
+    #include "semantic_tables.h"
 
     extern ProgramList *root;
     extern int yyparse(void);
