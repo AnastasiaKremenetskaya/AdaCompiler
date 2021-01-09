@@ -39,6 +39,7 @@ struct LocalVariable
         char * FunctionName;
         bool constant;
         enum variable_type varType; //TODO если че заменить на VAR_TYPE
+        enum expression_type exprType;
         bool isArray;
         LocalVariable()
         {
@@ -87,7 +88,7 @@ struct st_const {
 
 void st_stmt_list(struct StatementList * node);
 void st_stmt(struct Statement * node);
-void dec_decl(struct Declaration * node);
+void dec_decl(struct DeclarationStatement * node);
 void st_stmt_while(struct WhileStatement * node);
 void st_stmt_for(struct ForStatement * node);
 void st_stmt_func(struct Statement * node);
@@ -137,7 +138,7 @@ list<LocalVariable> Check_list;
 vector<int> descriptor_of_methods;
 vector<int> name_of_methods;
 
-StatementList *globalroot;
+ProgramList *globalroot;
 StatementList *rootwithoutfunc;
 
 char * CurrentFunctionName = "Main";
@@ -629,6 +630,7 @@ char * check_stack_operation(list <Expression *> operations){
         return type;
 }
 
+//DONE
 void check_equal(char *left,char *right){
 
         if(strcmp("A ",right) == 0)
@@ -660,6 +662,8 @@ void check_equal(char *left,char *right){
         }
         return;
 }
+
+//NOT_USED
 void mult_declaration(StatementList *root,Expression *var){
         int count = 0;
         struct Statement * current = root->begin;
@@ -673,32 +677,32 @@ void mult_declaration(StatementList *root,Expression *var){
 
                 if(current->type == ST_ASSIGN && var->type == ET_ID) {
 
-                        if(current->var->type != 'EXPR_MAS') {
-
-                                if(strcmp(var->exprList->first->val,current->stmtVal->exprList->first->val)==0)
-                                {
-
-                                        if(current->stmtVal->type != NULL) {
-
-                                                if(var->type != NULL)
-                                                {
-
-                                                        if(var->type != NULL)
-                                                        {
-                                                                if(var->type ==current->stmtVal->type)
-                                                                {
-                                                                        count++;
-                                                                }
-                                                                else{
-
-                                                                }
-                                                        }
-                                                }
-                                        }
-                                }
-                        }
+//                        if(current->var->type != 'EXPR_MAS') {
+//
+//                                if(strcmp(var->exprList->first->val,current->stmtVal->exprList->first->val)==0)
+//                                {
+//
+//                                        if(current->stmtVal->type != NULL) {
+//
+//                                                if(var->type != NULL)
+//                                                {
+//
+//                                                        if(var->type != NULL)
+//                                                        {
+//                                                                if(var->type ==current->stmtVal->type)
+//                                                                {
+//                                                                        count++;
+//                                                                }
+//                                                                else{
+//
+//                                                                }
+//                                                        }
+//                                                }
+//                                        }
+//                                }
+//                        }
                 }
-                current = current->next;
+                current = current->nextInList;
         }
 
         if(count > 1)
@@ -709,7 +713,7 @@ void mult_declaration(StatementList *root,Expression *var){
 }
 char * return_variable_type(Expression *var){
         char * str = (char*)malloc(sizeof(char)*33);
-        switch (var->type->type) {
+        switch (var->type) {
         case VT_INTEGER:       strcpy(str,"I ");    break;
         case VT_FLOAT:     strcpy(str,"F ");    break;
 //        case DOUBLETy:    strcpy(str,"D ");    break;
@@ -852,22 +856,22 @@ char * return_Expr_Init_Type(Expression *var){
 char *update_variable(ProgramList *root, Expression * var)
 {
 
-	if (/*var->type == EXPR_MET && */ var->val != NULL)
-	{
+//	if (/*var->type == EXPR_MET && */ var->val != NULL)
+//	{
+//
+//		for (auto c: main_functions_list)
+//		{
+//
+//			if (strcmp(c.id, var->val.string_val) == 0)
+//			{
+//				printf("c.id %s\n", c.id);
+//				return get_function_type(&c);
+//			}
+//		}
+//		return "";
+//	}
 
-		for (auto c: main_functions_list)
-		{
-
-			if (strcmp(c.id, var->val) == 0)
-			{
-				printf("c.id %s\n", c.id);
-				return get_function_type(&c);
-			}
-		}
-		return "";
-	}
-
-	list<list < LocalVariable>> function_variables;
+	list<list < LocalVariable> > function_variables;
 
 	for (auto c: function_variables)
 	{
@@ -884,7 +888,7 @@ char *update_variable(ProgramList *root, Expression * var)
 //			}
 //			else
 //			{
-				if (strcmp(b.name, var->exprList->begin->val) == 0)
+				if (strcmp(b.name, var->exprList->begin->val.string_val) == 0)
 				{
 					return Convert_Local_Variable_Type(b);
 				}
@@ -897,7 +901,7 @@ char *update_variable(ProgramList *root, Expression * var)
 	if (var->type != NULL)
 	{
 
-		result.name = var->exprList->begin->val;
+		result.name = var->exprList->begin->val.string_val;
 
 		//                        if(var->varconstant->constant == LETT)
 		//                        {
@@ -907,7 +911,7 @@ char *update_variable(ProgramList *root, Expression * var)
 		if (!FindVariable(result))
 		{
 			countofvar = countofvar + 1;
-			result.varType = var->type;
+			result.exprType = var->type;
 			if (strcmp(CurrentFunctionName, "Main") == 0)
 			{
 				result.id = table.size() + 4;
@@ -965,10 +969,10 @@ char *update_variable(ProgramList *root, Expression * var)
 		{
 			for (auto c: List_of_variable)
 			{
-				if (strcmp(c.name, var->exprList->first->val) == 0)
+				if (strcmp(c.name, var->exprList->begin->val.string_val) == 0)
 				{
-					c.varType = var->type;
-					result.varType = var->type;
+					c.exprType = var->type;
+					result.exprType = var->type;
 				}
 			}
 		}
@@ -980,7 +984,7 @@ char *update_variable(ProgramList *root, Expression * var)
 				return Convert_Local_Variable_Type(result);
 			}
 			else
-				printf("Double declaration %s ", var->exprList->begin->val);
+				printf("Double declaration %s ", var->exprList->begin->val.string_val);
 			//  exit(EXIT_FAILURE);
 		}
 		return Convert_Local_Variable_Type(result);
@@ -998,20 +1002,20 @@ char *update_variable(ProgramList *root, Expression * var)
 //		return return_variable_type(var);
 //	}
 	else if ((var->exprList != NULL &&
-			var->exprList->first != NULL) ||
+			var->exprList->begin != NULL) ||
 		/*var->type == 'EXPR_MAS' ||*/
 		var->type == ET_ID)
 	{
 		LocalVariable result;
 
-		if (var->type == 'EXPR_MAS')
-		{
-			result.name = var->left->exprList->begin->val;
-		}
-		else
-		{
-			result.name = var->exprList->begin->val;
-		}
+//		if (var->type == 'EXPR_MAS')
+//		{
+//			result.name = var->left->exprList->begin->val;
+//		}
+//		else
+//		{
+			result.name = var->exprList->begin->val.string_val;
+//		}
 
 		if (FindVariable(result))
 		{
@@ -1024,7 +1028,7 @@ char *update_variable(ProgramList *root, Expression * var)
 
 	if (var->type == ET_ID)
 	{
-		result.name = var->exprList->begin->val;
+		result.name = var->exprList->begin->val.string_val;
 	}
 //	if (var->type == EXPR_MAS)
 //	{
@@ -1047,22 +1051,22 @@ bool check_return_function(StatementList *root,char * type){
         while (current != NULL && !result) {
 
                 switch (current->type) {
-                case ST_WHILE: result = check_return_function(current->while_loop->body,type);                  break;
-                case ST_FOR:   result =check_return_function(current->for_loop->body,type);                      break;
+                case ST_WHILE: result = check_return_function(current->stmtVal.whileStmt->whileBlock,type);                  break;
+                case ST_FOR:   result =check_return_function(current->stmtVal.forStmt->stmtList,type);                      break;
                 case ST_EXPRESSION:                           break;
 //                case STMT_BLOCK: result = check_return_function(current->list,type);                         break;
-                case STMT_REPEAT: result = check_return_function(current->while_loop->body,type);                  break;
+//                case STMT_REPEAT: result = check_return_function(current->stmtVal.whileStmt->whileBlock, type);                  break;
                 case ST_RETURN:
-                        if (current->expr != NULL )
+                        if (current->stmtVal.exprStmt != NULL )
                         {
 
-                                if(current->expr->type != ET_ID && current->expr->type != EXPR_ID)
+                                if(current->stmtVal.exprStmt->type != ET_ID/* && current->expr->type != EXPR_ID*/)
                                 {
 
-                                        strcpy(str,return_Expr_Init_Type(current->expr));
+                                        strcpy(str,return_Expr_Init_Type(current->stmtVal.exprStmt));
                                 }
                                 else{
-                                        strcpy(str,update_variable(globalroot,current->expr));
+                                        strcpy(str,update_variable(globalroot,current->stmtVal.exprStmt));
                                 }
 
                                 if(strcmp("D",type) == 0 || strcmp("F",type) == 0)
@@ -1102,23 +1106,23 @@ bool check_return_function(StatementList *root,char * type){
                         break;
                 case ST_IF:
 
-                        result = check_return_function(current->if_tree->body,type);
+                        result = check_return_function(current->stmtVal.ifStmt->stmtList,type);
 
-                        struct IfStatement* currentif = current->if_tree->elseiflist->first;
+                        struct ElseIfStatement* currentif = current->stmtVal.ifStmt->elseIfStmtList->begin;
 
                         while (currentif != NULL && !result)
                         {
-                                result = check_return_function(currentif->body,type);
-                                currentif = currentif->next;
+                                result = check_return_function(currentif->stmtList,type);
+                                currentif = currentif->nextInList;
                         }
 
                         if(!result)
-                                result = check_return_function(current->if_tree->elsebody,type);
+                                result = check_return_function(current->stmtVal.ifStmt->stmtList,type);
 
                         break;
 
                 }
-                current = current->next;
+                current = current->nextInList;
         }
 
 
@@ -1130,16 +1134,16 @@ bool check_return_function(StatementList *root,char * type){
         {
                 if(currentbody->type == ST_RETURN) {
 
-                        if (currentbody->expr != NULL )
+                        if (currentbody->stmtVal.exprStmt != NULL )
                         {
 
-                                if(currentbody->expr->type != ET_ID && currentbody->expr->type != EXPR_ID)
+                                if(currentbody->stmtVal.exprStmt->type != ET_ID/* && currentbody->expr->type != EXPR_ID*/)
                                 {
-                                        strcpy(strbody,return_Expr_Init_Type(currentbody->expr));
+                                        strcpy(strbody,return_Expr_Init_Type(currentbody->stmtVal.exprStmt));
 
                                 }
                                 else{
-                                        strcpy(strbody,update_variable(globalroot,currentbody->expr));
+                                        strcpy(strbody,update_variable(globalroot,currentbody->stmtVal.exprStmt));
                                 }
 
                                 if(strcmp("D",type) == 0 || strcmp("F",type) == 0)
@@ -1163,7 +1167,7 @@ bool check_return_function(StatementList *root,char * type){
 
                         }
                 }
-                currentbody = currentbody->next;
+                currentbody = currentbody->nextInList;
         }
 
 return true;
@@ -1223,26 +1227,26 @@ char * get_function_type(struct Program * f){
 }
 void check_function_args(struct Expression * cur){
 
-        if (strcmp(cur->left->exprList->first->val, "print") == 0 || strcmp(cur->left->exprList->first->val, "toInt") == 0  ||  strcmp(cur->left->exprList->first->val, "toFloat") == 0)
+        if (strcmp(cur->left->exprList->begin->val.string_val, "print") == 0 || strcmp(cur->left->exprList->begin->val.string_val, "toInt") == 0  ||  strcmp(cur->left->exprList->begin->val.string_val, "toFloat") == 0)
         {
-                if(cur->right->exprList->first != NULL) {
-                        if(cur->right->exprList->first->type==ET_MINUS ||cur->right->exprList->first->type==ET_PLUS || cur->right->exprList->first->type==ET_MULT || cur->right->exprList->first->type==ET_DIV || cur->right->exprList->first->type==EXPR_MOD)
+                if(cur->right->exprList->begin != NULL) {
+                        if(cur->right->exprList->begin->type==ET_MINUS ||cur->right->exprList->begin->type==ET_PLUS || cur->right->exprList->begin->type==ET_MULT || cur->right->exprList->begin->type==ET_DIV/* || cur->right->exprList->begin->type==EXPR_MOD*/)
                         {
 
-                                check_stack_operation(create_stack_operation(cur->right->exprList->first));
+                                check_stack_operation(create_stack_operation(cur->right->exprList->begin));
 
                         }
                         else {
-                          update_variable(globalroot,cur->right->exprList->first);
+                          update_variable(globalroot,cur->right->exprList->begin);
                         }
                 }
                 return;
         }
 
 
-        if(strcmp(cur->left->exprList->first->val, "readLine") == 0 )
+        if(strcmp(cur->left->exprList->begin->val.string_val, "readLine") == 0 )
         {
-                if(cur->right->exprList->first != NULL)
+                if(cur->right->exprList->begin != NULL)
                 {
                         printf("Function have extra argument\n");
                         exit (EXIT_FAILURE);
@@ -1250,10 +1254,10 @@ void check_function_args(struct Expression * cur){
                 return;
         }
 
-        if(cur->left->exprList->first->next != NULL) {
-                if(strcmp(cur->left->exprList->first->next->name, "count") == 0 )
+        if(cur->left->exprList->begin->nextInList != NULL) {
+                if(strcmp(cur->left->exprList->begin->nextInList->val.string_val, "count") == 0 )
                 {
-                        if(cur->right->exprList->first != NULL)
+                        if(cur->right->exprList->begin != NULL)
                         {
                                 printf("Function have extra argument\n");
                                 exit (EXIT_FAILURE);
@@ -1266,12 +1270,12 @@ void check_function_args(struct Expression * cur){
         char * newstr = (char*)malloc(sizeof(char)*33);
         bool exist = false;
         for (auto c : functions_list) {
-                if (strcmp(c.name->end->val, cur->left->exprList->first->val) == 0)
+                if (strcmp(c.id, cur->left->exprList->begin->val.string_val) == 0)
                 {
                         exist = true;
                         strcat(str,"");
                         strcpy(str,get_function_args(&c));
-                        struct Expression * cura = cur->right->exprList->first;
+                        struct Expression * cura = cur->right->exprList->begin;
                         strcat(newstr,"(");
                         while (cura != NULL) {
                                 if(cura->type == ET_ID) {
@@ -1281,7 +1285,7 @@ void check_function_args(struct Expression * cur){
                                         strcat(newstr,return_Expr_Init_Type(cura));
                                 }
 
-                                cura = cura->next;
+                                cura = cura->nextInList;
                         }
                         strcat(newstr,")");
 
@@ -1301,12 +1305,12 @@ void check_function_args(struct Expression * cur){
         }
 
         for (auto c : main_functions_list) {
-                if (strcmp(c.name->end->val, cur->left->exprList->first->val) == 0)
+                if (strcmp(c.id, cur->left->exprList->begin->val.string_val) == 0)
                 {
                         exist = true;
                         strcat(str,"");
                         strcpy(str,get_function_args(&c));
-                        struct Expression * cura = cur->right->exprList->first;
+                        struct Expression * cura = cur->right->exprList->begin;
                         strcat(newstr,"(");
 
                         while (cura != NULL) {
@@ -1318,7 +1322,7 @@ void check_function_args(struct Expression * cur){
                                 }
 
 
-                                cura = cura->next;
+                                cura = cura->nextInList;
                         }
                         strcat(newstr,")");
 
@@ -1358,14 +1362,14 @@ char* deblank(char* input)
 char * get_function_args(struct Program * f){
         char * str = (char*)malloc(sizeof(char)*33);
         strcat(str,"(");
-        if(f->args != NULL) {
-                struct Expression * current = f->args->first;
+        if(f->locals_list != NULL) {
+                struct Expression * current = f->locals_list->begin;
 
 
                 while(current != NULL)
                 {
                         strcat(str,return_variable_type(current));
-                        current = current->next;
+                        current = current->nextInList;
                 }
         }
         strcat(str,")");
@@ -1380,14 +1384,14 @@ void print_function_param(char * function,struct Statement * current){
         char * str = (char*)malloc(sizeof(char)*33);;
         char * strtemp = (char*)malloc(sizeof(char)*33);;
         int func_num = -1;
-        if(current->type == STMT_FUNC)
-        {
-                STConst name;
-                name.next = NULL;
-                name.type = CONST_UTF8;
-                name.value.utf8  = function;
-                table.push_back(name);
-                func_num = table.size();
+//        if(current->type == STMT_FUNC)
+//        {
+//                STConst name;
+//                name.next = NULL;
+//                name.type = CONST_UTF8;
+//                name.value.utf8  = function;
+//                table.push_back(name);
+//                func_num = table.size();
 
 //TODO REFACTOR добавить в стейтмент (tree_nodes.h поле struct Program * func;)
 //                if(strcmp(current->func->name->last->name,function) == 0)
@@ -1448,7 +1452,7 @@ void print_function_param(char * function,struct Statement * current){
 //                        table.push_back(method_ref);
 //
 //                }
-        }
+//        }
 }
 
 
@@ -1595,7 +1599,7 @@ void create_table(ProgramList *root){
 
         for(auto s: main_functions_list){
 
-        if(!check_return_function(s.body,get_function_type(&s)))
+        if(!check_return_function(s.performSection,get_function_type(&s)))
         {
                 printf("Return doesnot exist or wrong return value\n");
                 exit(EXIT_FAILURE);
@@ -1603,66 +1607,66 @@ void create_table(ProgramList *root){
       }
 }
 
-void create_main_table(StatementList *root){
-        struct Statement * current = root->begin;
-        while (current != NULL) {
-
-                if (current->type == ST_ASSIGN && current->type == STMT_LASSIGN) {
-
-                        st_stmt_expr(current->var);
-                        st_stmt_expr(current->expr);
-                }
-                current = current->next;
-        }
-}
+//void create_main_table(StatementList *root){
+//        struct Statement * current = root->begin;
+//        while (current != NULL) {
+//
+//                if (current->type == ST_ASSIGN/* && current->type == STMT_LASSIGN*/) {
+//
+//                        st_stmt_expr(current->var);
+//                        st_stmt_expr(current->expr);
+//                }
+//                current = current->next;
+//        }
+//}
 //############################################################################//
 void st_stmt_list(struct StatementList * node) {
-        struct Statement * current = node->first;
+        struct Statement * current = node->begin;
         while (current != NULL) {
                 st_stmt(current);
-                current = current->next;
+                current = current->nextInList;
         }
 }
 
 void st_stmt(struct Statement * node) {
   printf("node->type ->type %d \n",node->type);
         switch (node->type) {
-        case ST_WHILE:  st_stmt_while(node->stmtVal->whileStmt);                  break;
-        case ST_FOR:    st_stmt_for(node->stmtVal->forStmt);                      break;
+        case ST_WHILE:  st_stmt_while(node->stmtVal.whileStmt);                  break;
+        case ST_FOR:    st_stmt_for(node->stmtVal.forStmt);                      break;
         case ST_EXPRESSION:
 
-                if(node->stmtVal->exprStmt->type==ET_MINUS
-                ||node->stmtVal->exprStmt->type==ET_PLUS
-                || node->stmtVal->exprStmt->type==ET_MULT
-                || node->stmtVal->exprStmt->type==ET_DIV) {
+                if(node->stmtVal.exprStmt ->type==ET_MINUS
+                ||node->stmtVal.exprStmt ->type==ET_PLUS
+                || node->stmtVal.exprStmt ->type==ET_MULT
+                || node->stmtVal.exprStmt ->type==ET_DIV) {
 
-                        check_equal(update_variable(globalroot,node->stmtVal->exprStmt->left),update_variable(globalroot,node->stmtVal->exprStmt->right));
-                        st_stmt_expr(node->stmtVal->exprStmt->left);
-                        st_stmt_expr(node->stmtVal->exprStmt->right);
+                        check_equal(update_variable(globalroot,node->stmtVal.exprStmt ->left),update_variable(globalroot,node->stmtVal.exprStmt ->right));
+                        st_stmt_expr(node->stmtVal.exprStmt ->left);
+                        st_stmt_expr(node->stmtVal.exprStmt ->right);
                 }
                 else{
-                        st_stmt_expr(node->stmtVal->exprStmt);
+                        st_stmt_expr(node->stmtVal.exprStmt );
                 }
 
                 break;
 //        case STMT_BLOCK:  st_stmt_list(node->list);                         break;
 //        case STMT_REPEAT: st_stmt_while(node->while_loop);                  break;
 //        case STMT_LFUNC:  st_stmt_func(node);                               break;
-        case ST_RETURN: if (node->expr != NULL){
+        case ST_RETURN: if (node->stmtVal.exprStmt != NULL){
 
-        if(node->stmtVal->exprStmt->type==ET_MINUS
-        ||node->stmtVal->exprStmt->type==ET_PLUS
-        || node->stmtVal->exprStmt->type==ET_MULT
-        || node->stmtVal->exprStmt->type==ET_DIV
-        /*|| node->stmtVal->exprStmt->type==EXPR_MOD*/) {
+        if(node->stmtVal.exprStmt ->type==ET_MINUS
+        ||node->stmtVal.exprStmt ->type==ET_PLUS
+        || node->stmtVal.exprStmt ->type==ET_MULT
+        || node->stmtVal.exprStmt ->type==ET_DIV
+        /*|| node->stmtVal.exprStmt ->type==EXPR_MOD*/) {
 
-                st_stmt_expr(node->stmtVal->exprStmt->left);
-                st_stmt_expr(node->stmtVal->exprStmt->right);
+                st_stmt_expr(node->stmtVal.exprStmt ->left);
+                st_stmt_expr(node->stmtVal.exprStmt ->right);
         }
         else{
-                st_stmt_expr(node->stmtVal->exprStmt);
+                st_stmt_expr(node->stmtVal.exprStmt );
         }  }break;
-        case ST_IF:     st_stmt_if(node->stmtVal->ifStmt);                        break;
+        case ST_IF:     st_stmt_if(node->stmtVal.ifStmt);                        break;
         //case STMT_SWITCH:  st_stmt_switch(node->switch_tree);               break;
 
 //        case STMT_FUNC: {
@@ -1708,16 +1712,16 @@ void st_stmt(struct Statement * node) {
 //                        break;
 
         case ST_ASSIGN:{
-            printf("node->expr->type right %d \n", node->stmtVal->assigStmt->right->type);
-            printf("node->var->type left %d \n", node->stmtVal->assigStmt->left->type);
+            printf("node->expr->type right %d \n", node->stmtVal.assigStmt->right->type);
+            printf("node->var->type left %d \n", node->stmtVal.assigStmt->left->type);
             LocalVariable temp;
 
 //  if(node->var->type == 'EXPR_MAS'){
 //      temp = is_in_local_vars(node->var->left->exprList->first->val);
 //  }
 //    else
-    if (node->stmtVal->exprStmt->type == ET_ID){
-        temp = is_in_local_vars(node->stmtVal->exprStmt->exprList->begin->val);
+    if (node->stmtVal.exprStmt ->type == ET_ID){
+        temp = is_in_local_vars(node->stmtVal.exprStmt ->exprList->begin->val.string_val);
       }
 
         if(temp.constant && temp.id != -1 )
@@ -1725,48 +1729,48 @@ void st_stmt(struct Statement * node) {
           printf("Try to change for Constant");
           exit(EXIT_FAILURE);
         }
-                if (node->stmtVal->exprStmt->type == ET_ID)
-                {
-                //TODO надо бы вернуть, но у  меня нет в стейтменте поля var и expr
-//                        check_equal(update_variable(globalroot,node->stmtVal->exprStmt),update_variable(globalroot,node->expr));
-                }
+//                if (node->stmtVal.exprStmt ->type == ET_ID)
+//                {
+//                //TODO надо бы вернуть, но у  меня нет в стейтменте поля var и expr
+////                        check_equal(update_variable(globalroot,node->stmtVal.exprStmt ),update_variable(globalroot,node->expr));
+//                }
 
-                else if (node->stmtVal->exprStmt->type==ET_MINUS
-                ||node->stmtVal->exprStmt->type==ET_PLUS
-                || node->stmtVal->exprStmt->type==ET_MULT
-                || node->stmtVal->exprStmt->type==ET_DIV
-                /*|| node->stmtVal->exprStmt->type==EXPR_MOD*/)
-                {
-                        check_stack_operation(create_stack_operation(node->stmtVal->exprStmt));
-
-                        struct NVarType* result = (NVarType*)malloc(sizeof(NVarType));
-                      if(node->type != NULL){
-                        if(node->var->type->type == VT_VOID)
-                        {
-                          switch (check_stack_operation(create_stack_operation(node->expr))[0]) {
-                    			case 'I':    result->type = VT_INTEGER;     break;
-                    			case 'F':    result->type = VT_FLOAT;   break;
-                    			case 'S':		 result->type = VT_STRING;  break;
-                          case 'B':    result->type = VT_BOOLEAN;    break;
-                    			default:              break;
-                    			}
-                          node->var->type = result;
-                        }
-                      }
-                      else{
-                        switch (check_stack_operation(create_stack_operation(node->expr))[0]) {
-                        case 'I':    result->type = VT_INTEGER;     break;
-                        case 'F':    result->type = VT_FLOAT;   break;
-//                        case 'D':    result->type = DOUBLETy;  break;
-                        case 'S':		 result->type = VT_STRING;  break;
-                        case 'B':    result->type = VT_BOOLEAN;    break;
-                        default:              break;
-                        }
-                        node->var->type = result;
-
-                      }
-                        check_equal(update_variable(globalroot,node->var),check_stack_operation(create_stack_operation(node->expr)));
-                }
+//                else if (node->stmtVal.exprStmt ->type==ET_MINUS
+//                ||node->stmtVal.exprStmt ->type==ET_PLUS
+//                || node->stmtVal.exprStmt ->type==ET_MULT
+//                || node->stmtVal.exprStmt ->type==ET_DIV
+//                /*|| node->stmtVal.exprStmt ->type==EXPR_MOD*/)
+//                {
+//                        check_stack_operation(create_stack_operation(node->stmtVal.exprStmt ));
+//
+//                        struct NVarType* result = (NVarType*)malloc(sizeof(NVarType));
+//                      if(node->type != NULL){
+//                        if(node->var->type->type == VT_VOID)
+//                        {
+//                          switch (check_stack_operation(create_stack_operation(node->expr))[0]) {
+//                    			case 'I':    result->type = VT_INTEGER;     break;
+//                    			case 'F':    result->type = VT_FLOAT;   break;
+//                    			case 'S':		 result->type = VT_STRING;  break;
+//                          case 'B':    result->type = VT_BOOLEAN;    break;
+//                    			default:              break;
+//                    			}
+//                          node->var->type = result;
+//                        }
+//                      }
+//                      else{
+//                        switch (check_stack_operation(create_stack_operation(node->expr))[0]) {
+//                        case 'I':    result->type = VT_INTEGER;     break;
+//                        case 'F':    result->type = VT_FLOAT;   break;
+////                        case 'D':    result->type = DOUBLETy;  break;
+//                        case 'S':		 result->type = VT_STRING;  break;
+//                        case 'B':    result->type = VT_BOOLEAN;    break;
+//                        default:              break;
+//                        }
+//                        node->var->type = result;
+//
+//                      }
+//                        check_equal(update_variable(globalroot,node->var),check_stack_operation(create_stack_operation(node->expr)));
+//                }
 
 //                else if(node->expr->type == EXPR_MET )
 //                {
@@ -1889,11 +1893,11 @@ void st_stmt(struct Statement * node) {
 //                                }
 //                }
 
-                else{
-
-
-                        if(node->expr->type == EXPR_TABLE && node->expr->array_id == 0)
-                        {
+//                else{
+//
+//
+//                        if(node->expr->type == EXPR_TABLE && node->expr->array_id == 0)
+//                        {
 //                          switch (node->expr->type->type){
 //                            case VT_INTEGER:
 //                            node->expr->type->type = ARRAYINTTy;
@@ -1924,22 +1928,17 @@ void st_stmt(struct Statement * node) {
 //                                        update_variable(globalroot,currentElem->value);
 //                                        currentElem = currentElem->next;
 //                                }
-                        }
-                        else {
-                            check_equal(update_variable(globalroot,node->var),update_variable(globalroot,node->expr));
-                        }
-
-                }
+//                        }
+//                        else {
+//                            check_equal(update_variable(globalroot,node->var),update_variable(globalroot,node->expr));
+//                        }
+//
+//                }
 //check_equal(update_variable(globalroot,node->var),update_variable(globalroot,node->expr));
-                st_stmt_expr(node->var);
-                st_stmt_expr(node->expr);
+                st_stmt_expr(node->stmtVal.exprStmt );
 }
                 break;
-        case STMT_LASSIGN:
-                update_variable(globalroot,node->var);
-                st_stmt_expr(node->var);
 
-                break;
         default:
                 break;
         }
@@ -1963,11 +1962,13 @@ void st_stmt(struct Statement * node) {
 //        st_stmt_switch_list(node->caselist);
 //}
 
+//DONE
 void st_stmt_while(struct WhileStatement * node) {
         update_variable(globalroot,node->condition->left);
-        update_variable(globalroot,node->condition->left);
+        update_variable(globalroot,node->condition->right);
+//        update_variable(globalroot,node->condition->left);
         st_stmt_expr(node->condition);
-        st_stmt_list(node->body);
+        st_stmt_list(node->whileBlock);
 }
 
 //DONE
@@ -1977,28 +1978,30 @@ void st_stmt_for(struct ForStatement * node) {
         st_stmt_list(node->stmtList);
 }
 
+
+//NOT USED
 void st_stmt_func(struct Statement * node) {
 
-  struct Expression* list = (Expression *)malloc(sizeof(Expression));
-  list = node->func->args->first;
-
-  while(list != NULL) {
-
-//    struct NConstant * nconst = (NConstant *)malloc(sizeof(NConstant));
-//    nconst->constant = LETT;
+//  struct Expression* list = (Expression *)malloc(sizeof(Expression));
+//  list = node->func->args->first;
 //
-//          list->varconstant = nconst;
-
-          st_stmt_expr(list);
-
-          list = list->next;
-          //countofvar = countofvar + 1;
-  }
-  printf("countofvar %d \n", countofvar);
-  printf("function variables count %d\n", function_variables.size() );
-
-        print_function_param(node->func->name->last->name,node);
-        st_stmt_list(node->func->body);
+//  while(list != NULL) {
+//
+////    struct NConstant * nconst = (NConstant *)malloc(sizeof(NConstant));
+////    nconst->constant = LETT;
+////
+////          list->varconstant = nconst;
+//
+//          st_stmt_expr(list);
+//
+//          list = list->next;
+//          //countofvar = countofvar + 1;
+//  }
+//  printf("countofvar %d \n", countofvar);
+//  printf("function variables count %d\n", function_variables.size() );
+//
+//        print_function_param(node->func->name->last->name,node);
+//        st_stmt_list(node->func->body);
 
 }
 
@@ -2012,76 +2015,62 @@ void st_stmt_if(struct IfStatement * node) {
 
         st_stmt_list(node->stmtList);
 
-        struct IfStatement* current = node->elseIfStmtList->begin;
+        struct Statement * currentStatement = node->stmtList->begin;
+        struct IfStatement* current = currentStatement->stmtVal.ifStmt;
+        //struct ElseIfStatement* current = node->elseIfStmtList->begin;
         while (current != NULL)
         {
                 st_stmt_if(current);
-                current = current->nextInList;
+                current = currentStatement->nextInList->stmtVal.ifStmt;
         }
 
         st_stmt_list(node->elseStmt->stmtList);
 }
 
+//DONE
 void st_stmt_expr(struct Expression * node) {
   printf("st_stmt_expr node->type %d\n",node->type);
         switch (node->type) {
         case ET_INTEGER: {
-                if (st_constant_index(CONST_INT, (void *)&(node->Int)) == -1) {
+                if (st_constant_index(CONST_INT, (void *)&(node->val.int_val)) == -1) {
                         STConst cint;
                         cint.next = NULL;
                         cint.type = CONST_INT;
-                        cint.value.val_int = node->Int;
+                        cint.value.val_int = node->val.int_val;
                         table.push_back(cint);
-                        node->id = st_constant_index(CONST_INT, (void *)&(node->Int));
+                        node->id = st_constant_index(CONST_INT, (void *)&(node->val.int_val));
                 }
                 else{
-                        node->id = st_constant_index(CONST_INT, (void *)&(node->Int));
+                        node->id = st_constant_index(CONST_INT, (void *)&(node->val.int_val));
                 }
         }
                        break;
 
         case ET_FLOAT: {
-                if (st_constant_index( CONST_FLOAT, (void *)&(node->Float)) == -1) {
+                if (st_constant_index( CONST_FLOAT, (void *)&(node->val.float_val)) == -1) {
                         STConst cfloat1;
                         cfloat1.next = NULL;
 
                         cfloat1.type = CONST_FLOAT;
-                        cfloat1.value.val_float = node->Float;
+                        cfloat1.value.val_float = node->val.float_val;
 
                         table.push_back(cfloat1);
-                        node->id = st_constant_index(CONST_FLOAT, (void *)&(node->Float));
+                        node->id = st_constant_index(CONST_FLOAT, (void *)&(node->val.float_val));
 
                 }
                 else{
-                        node->id = st_constant_index(CONST_FLOAT, (void *)&(node->Float));
+                        node->id = st_constant_index(CONST_FLOAT, (void *)&(node->val.float_val));
                 }
         }
-
-        case EXPR_DOUBLE: {
-                if (st_constant_index( CONST_DOUBLE, (void *)&(node->Double)) == -1) {
-                        STConst cfloat;
-                        cfloat.next = NULL;
-
-                        cfloat.type = CONST_DOUBLE;
-                        cfloat.value.val_double = node->Double;
-                        table.push_back(cfloat);
-                        node->id = st_constant_index(CONST_DOUBLE, (void *)&(node->Double));
-
-                }
-                else{
-                        node->id = st_constant_index(CONST_DOUBLE, (void *)&(node->Double));
-                }
-        }
-                          break;
 
         case ET_STRING: {
                 // Make UTF-8
-                if (st_constant_index( CONST_UTF8, (void*)(node->name)) == -1) {
+                if (st_constant_index( CONST_UTF8, (void*)(node->val.string_val)) == -1) {
                         STConst utf8;
                         utf8.next = NULL;
 
                         utf8.type = CONST_UTF8;
-                        utf8.value.utf8 = node->name; // `strcpy` it in case of problems
+                        utf8.value.utf8 = node->val.string_val; // `strcpy` it in case of problems
 
                         table.push_back(utf8);
 
@@ -2094,34 +2083,104 @@ void st_stmt_expr(struct Expression * node) {
 
                         table.push_back(cstr);
 
-                        node->id = st_constant_index( CONST_UTF8, (void*)(node->name)) + 1;
+                        node->id = st_constant_index( CONST_UTF8, (void*)(node->val.string_val)) + 1;
                 }
                 else{
-                        node->id = st_constant_index(CONST_UTF8, (void *)(node->name)) + 1;
+                        node->id = st_constant_index(CONST_UTF8, (void *)(node->val.string_val)) + 1;
                 }
         }
                        break;
 
-        case EXPR_MET: {
-                function_call.push_back(*node);
-                check_function_args(node);
+//        case EXPR_MET: {
+//                function_call.push_back(*node);
+//                check_function_args(node);
+//
+//                struct Expression * cur = node->right->exprList->first;
+//                while (cur != NULL) {
+//                        st_stmt_expr(cur);
+//                        cur = cur->next;
+//                }
+//        }
+//                       break;
 
-                struct Expression * cur = node->right->exprList->first;
-                while (cur != NULL) {
-                        st_stmt_expr(cur);
-                        cur = cur->next;
-                }
-        }
-                       break;
-
+//        case EXPR_ID_LIST: {
+//                if(node->type != NULL) {
+//                        if(node->exprList->first->val != NULL)
+//                        {
+//                                LocalVariable result;
+//                                result.varType = node->type;
+//                                result.name = node->exprList->begin->val;
+//                                result.isArray = false;
+//                                result.FunctionName = CurrentFunctionName;
+////                                if(node->varconstant != NULL)
+////                                        if(node->varconstant->constant != VART )
+////                                        {
+////                                                result.constant = true;
+////                                        }
+//                                /* тут вставить сбор в контейнер expr */
+//                                if(!FindVariable(result))
+//                                {
+//                                        countofvar = countofvar  + 1;
+//                                        if(strcmp(CurrentFunctionName , "Main") == 0){
+//                                          result.id = table.size() + 4 ;
+//                                        }
+//                                        else{
+//                                          result.id = countofvar;
+//                                        }
+//
+//                                        List_of_variable.push_back(result);
+//
+//                                        if(strcmp(CurrentFunctionName , "Main") == 0){
+//                                        STConst name;
+//                                        name.next = NULL;
+//                                        name.type = CONST_UTF8;
+//                                      //  name.value.utf8 = "aaa";
+//                                        name.value.utf8 = node->val;
+//                                        table.push_back(name);
+//
+//                                        STConst type;
+//                                        type.next = NULL;
+//                                        type.type = CONST_UTF8;
+//                                       char * str = (char*)malloc(sizeof(char)*33);
+//                                       strcat(str , Convert_Local_Variable_Type(result));
+//
+//                                        type.value.utf8  = deblank(str);
+//
+//                                        if(str[0] == 'S'){
+//                                         type.value.utf8  = "Ljava/lang/String;";
+//                                       }else{
+//                                         type.value.utf8  = deblank(str);;
+//                                       }
+//                                        table.push_back(type);
+//
+//                                        STConst name_type;
+//                                        name_type.next = NULL;
+//                                        name_type.type = CONST_NAMETYPE;
+//                                        name_type.value.args.arg1  = table.size() - 2;
+//                                        name_type.value.args.arg2  = table.size() - 1;
+//                                        table.push_back(name_type);
+//
+//                                        STConst field_ref;
+//                                        field_ref.next = NULL;
+//                                        field_ref.type = CONST_FIELDREF;
+//                                        field_ref.value.args.arg1  = 3;
+//                                        field_ref.value.args.arg2  = table.size()-1;
+//                                        table.push_back(field_ref);
+//
+//                                        Fields_table.push_back(name_type);
+//                                      }
+//                                    }
+//                        }
+//                }
+//        }
         case ET_ID: {
                 if(node->type != NULL) {
-                        if(node->exprList->first->val != NULL)
+                        if(node->val.string_val != NULL)
                         {
                                 LocalVariable result;
-                                result.varType = node->type->type;
-                                result.name = node->exprList->first->val;
-                                result.isArray = node->isArray;
+                                result.exprType = node->type;
+                                result.name = node->val.string_val;
+                                result.isArray = false;
                                 result.FunctionName = CurrentFunctionName;
 //                                if(node->varconstant != NULL)
 //                                        if(node->varconstant->constant != VART )
@@ -2146,77 +2205,7 @@ void st_stmt_expr(struct Expression * node) {
                                         name.next = NULL;
                                         name.type = CONST_UTF8;
                                       //  name.value.utf8 = "aaa";
-                                        name.value.utf8 = node->name;
-                                        table.push_back(name);
-
-                                        STConst type;
-                                        type.next = NULL;
-                                        type.type = CONST_UTF8;
-                                       char * str = (char*)malloc(sizeof(char)*33);
-                                       strcat(str , Convert_Local_Variable_Type(result));
-
-                                        type.value.utf8  = deblank(str);
-
-                                        if(str[0] == 'S'){
-                                         type.value.utf8  = "Ljava/lang/String;";
-                                       }else{
-                                         type.value.utf8  = deblank(str);;
-                                       }
-                                        table.push_back(type);
-
-                                        STConst name_type;
-                                        name_type.next = NULL;
-                                        name_type.type = CONST_NAMETYPE;
-                                        name_type.value.args.arg1  = table.size() - 2;
-                                        name_type.value.args.arg2  = table.size() - 1;
-                                        table.push_back(name_type);
-
-                                        STConst field_ref;
-                                        field_ref.next = NULL;
-                                        field_ref.type = CONST_FIELDREF;
-                                        field_ref.value.args.arg1  = 3;
-                                        field_ref.value.args.arg2  = table.size()-1;
-                                        table.push_back(field_ref);
-
-                                        Fields_table.push_back(name_type);
-                                      }
-                                    }
-                        }
-                }
-        }
-        case EXPR_ID: {
-                if(node->type != NULL) {
-                        if(node->name != NULL)
-                        {
-                                LocalVariable result;
-                                result.varType = node->type->type;
-                                result.name = node->name;
-                                result.isArray = node->isArray;
-                                result.FunctionName = CurrentFunctionName;
-//                                if(node->varconstant != NULL)
-//                                        if(node->varconstant->constant != VART )
-//                                        {
-//                                                result.constant = true;
-//                                        }
-                                /* тут вставить сбор в контейнер expr */
-                                if(!FindVariable(result))
-                                {
-                                        countofvar = countofvar  + 1;
-                                        if(strcmp(CurrentFunctionName , "Main") == 0){
-                                          result.id = table.size() + 4 ;
-                                        }
-                                        else{
-                                          result.id = countofvar;
-                                        }
-
-                                        List_of_variable.push_back(result);
-
-                                        if(strcmp(CurrentFunctionName , "Main") == 0){
-                                        STConst name;
-                                        name.next = NULL;
-                                        name.type = CONST_UTF8;
-                                      //  name.value.utf8 = "aaa";
-                                        name.value.utf8 = node->name;
+                                        name.value.utf8 = node->val.string_val;
                                         table.push_back(name);
 
                                         STConst type;
@@ -2270,15 +2259,18 @@ void st_stmt_expr(struct Expression * node) {
                 st_stmt_expr(node->right);
         }
 }
+
+//DONE
 int Expressionlist_count(ExpressionList * start) {
         int count = 0;
-        Expression * cur = start->first;
+        Expression * cur = start->begin;
         while (cur != NULL) {
                 count++;
-                cur = cur->next;
+                cur = cur->nextInList;
         }
         return count;
 }
+
 int st_constant_index(enum st_const_types type, const void * value) {
 
         int index = 0;
@@ -2291,11 +2283,11 @@ int st_constant_index(enum st_const_types type, const void * value) {
                                 }
                                 break;
 
-                        case CONST_DOUBLE:
-                                if (c.value.val_double == *((double *)value)) {
-                                        return index;
-                                }
-                                break;
+//                        case CONST_DOUBLE:
+//                                if (c.value.val_double == *((double *)value)) {
+//                                        return index;
+//                                }
+//                                break;
 
 
                         case CONST_FLOAT:
@@ -2319,6 +2311,7 @@ int st_constant_index(enum st_const_types type, const void * value) {
         }
         return -1;
 }
+
 int st_constant_index2(STConst * table, enum st_const_types type, int arg1, int arg2) {
         STConst * cur = table;
         int index = 0;
@@ -2334,6 +2327,7 @@ int st_constant_index2(STConst * table, enum st_const_types type, int arg1, int 
         }
         return -1;
 }
+
 void st_print_const_file(FILE * output) {
 
         char name[10] = "";
@@ -2386,6 +2380,7 @@ void printLocalVars(){
         }
 
 }
+
 void printLocalVars_file(FILE *output){
         list<st_const> tempTable;
         tempTable = table;
@@ -2394,8 +2389,8 @@ void printLocalVars_file(FILE *output){
         for (auto t : functions_list) {
                 table.clear();
 
-                st_stmt_list(t.body);
-                fprintf(output,"%s:;\n",t.name->last->name);
+                st_stmt_list(t.performSection);
+                fprintf(output,"%s:;\n",t.id);
                 fprintf(output,";List local variables:;\n");
                 for (auto c : table) {
                         switch (c.type) {
@@ -2407,6 +2402,7 @@ void printLocalVars_file(FILE *output){
         }
         table = tempTable;
 }
+
 void printTable(){
         char name[10] = "";
         int index = 0;
