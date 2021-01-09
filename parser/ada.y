@@ -399,6 +399,7 @@ Range *createRange(Expression *startIndex, Expression *lastIndex, char* id)
 	result->startIndex = startIndex;
 	result->lastIndex = lastIndex;
 	result->id = id;
+	return result;
 }
 
 StatementList *appendStatementToList(StatementList *list, Statement *stmt)
