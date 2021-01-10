@@ -13,9 +13,9 @@
   	#include <malloc.h>
   	#endif
 
-    #include "../parser/tree_nodes.h"
-    #include "grammar.tab.h"
-    #include "semantic_tables.h"
+//    #include "../parser/tree_nodes.h"
+        #include "../parser/semantic_tables.h"
+        #include "../parser/grammar.tab.h"
 
     extern ProgramList *root;
     extern int yyparse(void);
@@ -190,11 +190,11 @@ int main(int argc,char* argv[])
         fclose(stdout);
 
 
-        //output = fopen("constant_table.csv","w");
-        //fprintf(output, "%s", ";Constant table:;\n");
-        //create_table(root);
+        output = fopen("constant_table.csv","w");
+        fprintf(output, "%s", ";Constant table:;\n");
+        create_table(root);
         //st_print_const_file(output);
-        //printLocalVars_file(output);
+        printLocalVars_file(output);
       //generate_byte_code();
     }
     return 0;
