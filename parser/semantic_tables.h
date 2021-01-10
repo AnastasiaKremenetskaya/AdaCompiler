@@ -108,8 +108,9 @@ char * st_gen_func_handle(Program * f, char * buffer);
 char * get_function_args(struct Program * f);
 char * update_variable(ProgramList *root,Expression *var);
 void mult_declaration(StatementList *root,Expression *var);
-void process_functions(struct ProgramList * node);
-void recursive_collect_inner_functions(struct Program * node);
+//void process_functions(struct ProgramList * node);
+void collect_functions(struct ProgramList * node);
+//void recursive_collect_inner_functions(struct Program * node);
 void printTable();
 char * return_Expr_Init_Type(Expression *var);
 char * return_variable_type(Expression *var);
@@ -119,7 +120,7 @@ struct LocalVariable is_in_local_vars(char*name);
 //############################################################################//
 
 list<st_const> table;
-list<Program> functions_list;
+list<DeclarationStatement> functions_list;
 list<Expression> function_call;
 list<Program> main_functions_list;
 list<st_const> Main_table;
@@ -1270,11 +1271,11 @@ void check_function_args(struct Expression * cur){
         char * newstr = (char*)malloc(sizeof(char)*33);
         bool exist = false;
         for (auto c : functions_list) {
-                if (strcmp(c.id, cur->left->exprList->begin->val.string_val) == 0)
+                if (strcmp(c.stmt.prog->id, cur->left->exprList->begin->val.string_val) == 0)
                 {
                         exist = true;
                         strcat(str,"");
-                        strcpy(str,get_function_args(&c));
+                        strcpy(str,get_function_args(c.stmt.prog));
                         struct Expression * cura = cur->right->exprList->begin;
                         strcat(newstr,"(");
                         while (cura != NULL) {
@@ -1498,6 +1499,7 @@ void print_function_param(char * function, StatementList *root){
 //        table.push_back(code);
 }
 
+//DONE
 void collect_functions(struct ProgramList *node)
 {
 	struct Program *current = node->begin;
@@ -1518,6 +1520,45 @@ void collect_functions(struct ProgramList *node)
 	}
 }
 
+void dec_decl(struct DeclarationStatement *node) {
+        for (auto c : functions_list)
+        {
+                if (strcmp(c.stmt.prog->id,node->stmt.prog->id) == 0)
+                {
+                        printf("Redefine function\n");
+                        exit(EXIT_FAILURE);
+                }
+        }
+
+        bool flag = false;
+
+
+        for(auto cf : main_functions_list)
+        {
+                if (strcmp(cf.id,node->stmt.prog->id) == 0)
+                {
+                        flag = true;
+                        break;
+                }
+        }
+        if(!flag)
+                functions_list.push_back(*node);
+
+        // Fill table.
+        list<LocalVariable> temp;
+        int tempCount = countofvar;
+        temp = List_of_variable;
+        List_of_variable.clear();
+        countofvar = -1;
+
+        CurrentFunctionName = node->stmt.prog->id;
+        //st_stmt_func(node); //TODO кидать сюда declaration - void st_stmt_func(struct Statement * node);
+
+        function_variables.push_back(List_of_variable);
+        List_of_variable = temp;
+        countofvar = tempCount;
+        CurrentFunctionName = "Main";
+}
 //void process_functions(struct ProgramList *node)
 //{
 //	struct Program *current = node->begin;
@@ -1563,27 +1604,32 @@ void create_table(ProgramList *root){
 
         globalroot = root;
 
-        process_functions(globalroot);
+        collect_functions(globalroot);
 
         struct Program * current = root->begin;
 
-        while (current != NULL) {
-            struct Statement * currentStmt = current->performSection->begin;
+//        while (current != NULL) {
+//            struct Statement * currentStmt = current->performSection->begin;
 
-            while (currentStmt != NULL) {
-                st_stmt(currentStmt);
-                currentStmt->nextInList;
-            }
+//            while (currentStmt != NULL) {
+//                st_stmt(currentStmt);
+//                if(currentStmt != currentStmt->nextInList) {
+//                   currentStmt->nextInList;
+//                } else {
+//                   currentStmt = NULL;
+//                }
+//                printf("curSTMT %d \n",current);
+//            }
 
-            struct DeclarationStatement * currentDeclStmt = current->declarationSection->begin;
-
-            while (currentDeclStmt != NULL) {
-                dec_decl(currentDeclStmt);
-                currentDeclStmt->nextInList;
-            }
-
-            current = current->nextInList;
-        }
+//            struct DeclarationStatement * currentDeclStmt = current->declarationSection->begin;
+//
+//            while (currentDeclStmt != NULL) {
+//                dec_decl(currentDeclStmt);
+//                currentDeclStmt->nextInList;
+//            }
+//
+//            current = current->nextInList;
+//        }
 
         printTable();
         printLocalVars();
@@ -1635,14 +1681,14 @@ void st_stmt(struct Statement * node) {
         case ST_FOR:    st_stmt_for(node->stmtVal.forStmt);                      break;
         case ST_EXPRESSION:
 
-                if(node->stmtVal.exprStmt ->type==ET_MINUS
-                ||node->stmtVal.exprStmt ->type==ET_PLUS
-                || node->stmtVal.exprStmt ->type==ET_MULT
-                || node->stmtVal.exprStmt ->type==ET_DIV) {
+                if(node->stmtVal.exprStmt->type==ET_MINUS
+                ||node->stmtVal.exprStmt->type==ET_PLUS
+                || node->stmtVal.exprStmt->type==ET_MULT
+                || node->stmtVal.exprStmt->type==ET_DIV) {
 
-                        check_equal(update_variable(globalroot,node->stmtVal.exprStmt ->left),update_variable(globalroot,node->stmtVal.exprStmt ->right));
-                        st_stmt_expr(node->stmtVal.exprStmt ->left);
-                        st_stmt_expr(node->stmtVal.exprStmt ->right);
+                        check_equal(update_variable(globalroot,node->stmtVal.exprStmt->left),update_variable(globalroot,node->stmtVal.exprStmt->right));
+                        st_stmt_expr(node->stmtVal.exprStmt->left);
+                        st_stmt_expr(node->stmtVal.exprStmt->right);
                 }
                 else{
                         st_stmt_expr(node->stmtVal.exprStmt );
@@ -1654,14 +1700,14 @@ void st_stmt(struct Statement * node) {
 //        case STMT_LFUNC:  st_stmt_func(node);                               break;
         case ST_RETURN: if (node->stmtVal.exprStmt != NULL){
 
-        if(node->stmtVal.exprStmt ->type==ET_MINUS
-        ||node->stmtVal.exprStmt ->type==ET_PLUS
-        || node->stmtVal.exprStmt ->type==ET_MULT
-        || node->stmtVal.exprStmt ->type==ET_DIV
-        /*|| node->stmtVal.exprStmt ->type==EXPR_MOD*/) {
+        if(node->stmtVal.exprStmt->type==ET_MINUS
+        ||node->stmtVal.exprStmt->type==ET_PLUS
+        || node->stmtVal.exprStmt->type==ET_MULT
+        || node->stmtVal.exprStmt->type==ET_DIV
+        /*|| node->stmtVal.exprStmt->type==EXPR_MOD*/) {
 
-                st_stmt_expr(node->stmtVal.exprStmt ->left);
-                st_stmt_expr(node->stmtVal.exprStmt ->right);
+                st_stmt_expr(node->stmtVal.exprStmt->left);
+                st_stmt_expr(node->stmtVal.exprStmt->right);
         }
         else{
                 st_stmt_expr(node->stmtVal.exprStmt );
@@ -1720,8 +1766,8 @@ void st_stmt(struct Statement * node) {
 //      temp = is_in_local_vars(node->var->left->exprList->first->val);
 //  }
 //    else
-    if (node->stmtVal.exprStmt ->type == ET_ID){
-        temp = is_in_local_vars(node->stmtVal.exprStmt ->exprList->begin->val.string_val);
+    if (node->stmtVal.exprStmt->type == ET_ID){
+        temp = is_in_local_vars(node->stmtVal.exprStmt->exprList->begin->val.string_val);
       }
 
         if(temp.constant && temp.id != -1 )
@@ -1729,17 +1775,17 @@ void st_stmt(struct Statement * node) {
           printf("Try to change for Constant");
           exit(EXIT_FAILURE);
         }
-//                if (node->stmtVal.exprStmt ->type == ET_ID)
+//                if (node->stmtVal.exprStmt->type == ET_ID)
 //                {
 //                //TODO надо бы вернуть, но у  меня нет в стейтменте поля var и expr
 ////                        check_equal(update_variable(globalroot,node->stmtVal.exprStmt ),update_variable(globalroot,node->expr));
 //                }
 
-//                else if (node->stmtVal.exprStmt ->type==ET_MINUS
-//                ||node->stmtVal.exprStmt ->type==ET_PLUS
-//                || node->stmtVal.exprStmt ->type==ET_MULT
-//                || node->stmtVal.exprStmt ->type==ET_DIV
-//                /*|| node->stmtVal.exprStmt ->type==EXPR_MOD*/)
+//                else if (node->stmtVal.exprStmt->type==ET_MINUS
+//                ||node->stmtVal.exprStmt->type==ET_PLUS
+//                || node->stmtVal.exprStmt->type==ET_MULT
+//                || node->stmtVal.exprStmt->type==ET_DIV
+//                /*|| node->stmtVal.exprStmt->type==EXPR_MOD*/)
 //                {
 //                        check_stack_operation(create_stack_operation(node->stmtVal.exprStmt ));
 //
@@ -2389,8 +2435,8 @@ void printLocalVars_file(FILE *output){
         for (auto t : functions_list) {
                 table.clear();
 
-                st_stmt_list(t.performSection);
-                fprintf(output,"%s:;\n",t.id);
+                st_stmt_list(t.stmt.prog->performSection);
+                fprintf(output,"%s:;\n",t.stmt.prog->id);
                 fprintf(output,";List local variables:;\n");
                 for (auto c : table) {
                         switch (c.type) {
