@@ -13,9 +13,9 @@
   	#include <malloc.h>
   	#endif
 
-//    #include "../parser/tree_nodes.h"
-        #include "../parser/semantic_tables.h"
-        #include "../parser/grammar.tab.h"
+    #include "../parser/semantic_tables.h"
+    #include "../parser/grammar.tab.h"
+    #include "../parser/codegen.h"
 
     extern ProgramList *root;
     extern int yyparse(void);
@@ -195,7 +195,7 @@ int main(int argc,char* argv[])
         create_table(root);
         //st_print_const_file(output);
         printLocalVars_file(output);
-      //generate_byte_code();
+      generate_byte_code(root);
     }
     return 0;
 }

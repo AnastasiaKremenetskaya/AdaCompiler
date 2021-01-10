@@ -36,6 +36,7 @@ void code_name_and_type(int first , int second);
 void code_float_number(float number, int size);
 void generate_expr_assign(Statement *expr);
 void generate_elsif_code(IfStatement*elsif, std::vector<int> jump , std::vector<int> pos);
+void generate_program_unit(Program *root);
 void generate_func_proc_code(Program *func);
 void code_method_class();
 void generate_elsif_list_code(ElseIfStatementList *list, std::vector<int> jump , std::vector<int> pos);
@@ -191,7 +192,7 @@ for(int i = 0;i <name_of_methods.size() ;i++ ){
 
 	code_number(name_of_methods[i], 2);//имя метода   ->
 
-	code_number(discriptor_of_methods[i], 2);//дескриптор метода ->
+	code_number(descriptor_of_methods[i], 2);//дескриптор метода ->
 
 	code_number(1, 2);//количество атрибутов метода ->
 
@@ -469,7 +470,7 @@ bool is_var_global(Expression *expr){
 //{
 //	el =  is_in_local_vars(expr->left->idlist->first->name);
 //}
-//else if(expr->type == EXPR_ID_LIST) {
+//else if(expr->type == ET_ID_LIST) {
 //el = is_in_local_vars(expr->idlist->first->name);
 //
 //}
@@ -488,17 +489,17 @@ void generate_expr_assign(Statement *expr)
 {
 			std::vector<Expression> *vars;
 			LocalVariable el;
-printf("expr->var->type %d\n", expr->stmtVal.exprStmt->type );
-printf("expr->expr->type %d\n",expr->expr->type);
+//printf("expr->var->type %d\n", expr->stmtVal.exprStmt->type );
+printf("expr->expr->type %d\n",expr->stmtVal.exprStmt->type);
 
-				bool flagVar = is_var_global(expr->var);
-				bool flagExpr = is_var_global(expr->expr);
+//				bool flagVar = is_var_global(expr->stmtVal.exprStmt);
+				bool flagExpr = is_var_global(expr->stmtVal.exprStmt);
 
-				printf("flagVar %d flagExpr %d\n", flagVar , flagExpr);
+				printf("flagExpr %d\n" , flagExpr);
 //				if(expr->var->type != EXPR_MAS)
-				generate_expr_code(expr->expr);
+				generate_expr_code(expr->stmtVal.exprStmt);
 
-//				if( expr->var->type == EXPR_ID_LIST)
+//				if( expr->var->type == ET_ID_LIST)
 //				{	if(!expr->var->isArray){
 //					if(flagVar){
 //						el = is_in_local_vars(expr->var->idlist->first->name);
@@ -533,7 +534,7 @@ printf("expr->expr->type %d\n",expr->expr->type);
 //					}
 //					else{
 //						code_number(ALOAD, 1);
-//						el =  is_in_local_vars(expr->var->left->idlist->first->name);
+//						el =  is_in_local_vars(expr->var->left->idlist->begin->name);
 //						printf("ARRAY ID el.id - > %d",el.id);
 //						code_number(el.id, 1);
 //					}
@@ -553,13 +554,13 @@ printf("expr->expr->type %d\n",expr->expr->type);
 //						return;
 //
 //				}
-				if(!flagVar){
+//				if(!flagVar){
 //					if(expr->var->vartype != NULL){
-//				 if (expr->var->vartype->type == INTTy || expr->var->vartype->type== BOOLTy)
+//				 if (expr->var->vartype->type == VT_INTEGER || expr->var->vartype->type== VT_BOOLEAN)
 //					{
 //				//		code_number(ISTORE, 1);
 //					}
-//					else if (expr->var->vartype->type == FLOATTy || expr->var->vartype->type == DOUBLETy)
+//					else if (expr->var->vartype->type == FLOATTy || expr->var->vartype->type == VT_FLOAT)
 //					{
 //						//code_number(FSTORE, 1);
 //					}
@@ -568,56 +569,56 @@ printf("expr->expr->type %d\n",expr->expr->type);
 //					//	code_number(ASTORE, 1);
 //					}
 //				}
-					el = is_in_local_vars(expr->var->idlist->first->name);
-					code_number(el.id, 1);
-					return;
-				}
-				else{
-					el = is_in_local_vars(expr->var->idlist->first->name);
-					code_number(PUTSTATIC, 1);
-					code_number(el.id - 1, 2);
-					printf("el = is_in_local_vars(expr->var->idlist->first->name);\n");
-					return;
-				}
-				el = is_in_local_vars(expr->var->idlist->first->name);
-				code_number(el.id, 1);
+//					el = is_in_local_vars(expr->var->idlist->begin->name);
+//					code_number(el.id, 1);
+//					return;
+//				}
+//				else{
+//					el = is_in_local_vars(expr->var->idlist->begin->name);
+//					code_number(PUTSTATIC, 1);
+//					code_number(el.id - 1, 2);
+//					printf("el = is_in_local_vars(expr->var->idlist->begin->name);\n");
+//					return;
+//				}
+//				el = is_in_local_vars(expr->var->idlist->begin->name);
+//				code_number(el.id, 1);
 }
-
- int findMethodRef(enum NVarEnumType type , bool Print)
-{
-	switch(type)
-{
-case INTTy:
-		if(Print)
-		return 13;
-
-		return 39;
-		break;
-case FLOATTy:
-		if(Print)
-		return  17;
-
-		return  43;
-		break;
-case BOOLTy:
-		if(Print)
-		return  25;
-
-		return  51;
-		break;
-case STRINGTy:
-		if(Print)
-		return  29;
-
-		return  55;
-		break;
-default:
-		if(Print)
-		return  33;
-		break;
-}
-	return 33;
-}
+//TODO вернуть
+// int findMethodRef(enum NVarEnumType type , bool Print)
+//{
+//	switch(type)
+//{
+//case VT_INTEGER:
+//		if(Print)
+//		return 13;
+//
+//		return 39;
+//		break;
+////case FLOATTy:
+////		if(Print)
+////		return  17;
+////
+////		return  43;
+////		break;
+//case VT_BOOLEAN:
+//		if(Print)
+//		return  25;
+//
+//		return  51;
+//		break;
+//case VT_STRING:
+//		if(Print)
+//		return  29;
+//
+//		return  55;
+//		break;
+//default:
+//		if(Print)
+//		return  33;
+//		break;
+//}
+//	return 33;
+//}
 void generate_expr_code(Expression *expr)
 {
 
@@ -627,206 +628,206 @@ void generate_expr_code(Expression *expr)
 
 	switch (expr->type)
 	{
-	case EXPR_MAS:
+//	case EXPR_MAS:
+//	{
+//		LocalVariable el;
+//		el =  is_in_local_vars(expr->left->idlist->begin->name);
+//		if(strcmp(el.FunctionName,"Main")==0){
+//			code_number(GETSTATIC, 1);
+//			code_number(el.id - 1,2);
+//		}
+//		else{
+//		code_number(ALOAD, 1);
+//		printf("el.id %d + 1 %s",el.id,Convert_Local_Variable_Type(el));
+//		code_number(el.id, 1);
+//		}
+//
+//		printf("expr->right->type %d\n",expr->right->type);
+//		//exit(EXIT_FAILURE);
+//		generate_expr_code(expr->right);
+//
+//
+//		switch (Convert_Local_Variable_Type(el)[1]) {
+//		case 'I':    code_number(IALOAD, 1);     break;
+//		case 'F':    code_number(FALOAD, 1);   break;
+//		case 'D':    code_number(DALOAD, 1);  break;
+//		case 'S':    code_number(AALOAD, 1);  break;
+//		case 'A':    code_number(AALOAD, 1);  break;
+//		default:          printf("DEFAULT");       break;
+//		}
+//		break;
+//	}
+//	case ET_ID_LIST:
+//		{
+//			generate_name_list_code(expr->idlist);
+//			break;
+//		}
+	case ET_ID:
 	{
-		LocalVariable el;
-		el =  is_in_local_vars(expr->left->idlist->first->name);
-		if(strcmp(el.FunctionName,"Main")==0){
-			code_number(GETSTATIC, 1);
-			code_number(el.id - 1,2);
-		}
-		else{
-		code_number(ALOAD, 1);
-		printf("el.id %d + 1 %s",el.id,Convert_Local_Variable_Type(el));
-		code_number(el.id, 1);
-		}
+		LocalVariable elem = is_in_local_vars(expr->val.string_val);
 
-		printf("expr->right->type %d\n",expr->right->type);
-		//exit(EXIT_FAILURE);
-		generate_expr_code(expr->right);
-
-
-		switch (Convert_Local_Variable_Type(el)[1]) {
-		case 'I':    code_number(IALOAD, 1);     break;
-		case 'F':    code_number(FALOAD, 1);   break;
-		case 'D':    code_number(DALOAD, 1);  break;
-		case 'S':    code_number(AALOAD, 1);  break;
-		case 'A':    code_number(AALOAD, 1);  break;
-		default:          printf("DEFAULT");       break;
-		}
 		break;
 	}
-	case EXPR_ID_LIST:
-		{
-			generate_name_list_code(expr->idlist);
-			break;
-		}
-	case EXPR_ID:
-	{
-		LocalVariable elem = is_in_local_vars(expr->name);
 
-		break;
-	}
-
-	case EXPR_TABLE:
-	{
-
-		if (expr->vartype->type != ARRAYSTRINGTy )
-		{
-			int size = 0;
-			code_number(SIPUSH, 1);
-			 struct NTblElem * currentElem = expr->table->first;
-			  	while (currentElem != NULL)
-			 {
-				 size = size + 1;
-				 currentElem = currentElem->next;
-			 }
-			  currentElem = expr->table->first;
-			code_number(size,2);   // размер массива
-			code_number(NEWARRAY, 1);
-//			if (expr->vartype->type == ARRAYINTTy || expr->vartype->type == BOOLTy){
-//				code_number(10, 1);
+//	case EXPR_TABLE:
+//	{
+//
+//		if (expr->vartype->type != ARRAYSTRINGTy )
+//		{
+//			int size = 0;
+//			code_number(SIPUSH, 1);
+//			 struct NTblElem * currentElem = expr->table->begin;
+//			  	while (currentElem != NULL)
+//			 {
+//				 size = size + 1;
+//				 currentElem = currentElem->nextInList;
+//			 }
+//			  currentElem = expr->table->begin;
+//			code_number(size,2);   // размер массива
+//			code_number(NEWARRAY, 1);
+////			if (expr->vartype->type == ARRAYINTTy || expr->vartype->type == VT_BOOLEAN){
+////				code_number(10, 1);
+////			}
+////			else if (expr->vartype->type == ARRAYDOUBLETy || expr->vartype->type == ARRAYFLOATTy)
+////				code_number(6, 1);
+//
+//
+//
+//			if (currentElem != NULL)
+//			{
+//				for (int i = 0; i < size; i++)
+//				{
+//
+//					code_number(DUP, 1);
+//					code_number(SIPUSH, 1);
+//					code_number(i, 2);
+//					generate_expr_code(currentElem->value);
+////					if (expr->vartype->type == ARRAYINTTy)
+////					code_number(IASTORE, 1);
+////					else if (expr->vartype->type == ARRAYDOUBLETy || expr->vartype->type  == ARRAYFLOATTy)
+////						code_number(FASTORE, 1);
+////					else
+//					if (expr->vartype->type == VT_BOOLEAN)
+//						code_number(IASTORE, 1);
+//
+//					currentElem = currentElem->nextInList;
+//				}
 //			}
-//			else if (expr->vartype->type == ARRAYDOUBLETy || expr->vartype->type == ARRAYFLOATTy)
-//				code_number(6, 1);
+//
+//
+//		}
+//
+//
+//		break;
+//	}
 
+//	case EXPR_MET:
+//	{
+//
+//		if(expr->left->idlist->begin->nextInList != NULL)
+//		{
+//			if(strcmp(expr->left->idlist->begin->nextInList->name,"count") == 0)
+//			{
+//
+//
+//				LocalVariable el;
+//				el =  is_in_local_vars(expr->left->idlist->begin->name);
+//				if(strcmp(el.FunctionName,"Main")==0){
+//					code_number(GETSTATIC, 1);
+//					code_number(el.id - 1,2);
+//				}
+//				else{
+//				code_number(ALOAD, 1);
+//				printf("el.id %d",el.id);
+//				code_number(el.id, 1);
+//				}
+//
+//				code_number(ARRAYLENGTH,1);
+//				return;
+//			}
+//		}
+//		else if(strcmp(expr->left->idlist->begin->name,"toInt") == 0)
+//		{
+//			generate_expr_list_code(expr->right->idlist);
+//			code_number(INVOKESTATIC, 1);
+//			code_number(findMethodRef(VT_INTEGER,false), 2);
+//		}
+//		else if(strcmp(expr->left->idlist->begin->name,"toFloat") == 0)
+//		{
+//			generate_expr_list_code(expr->right->idlist);
+//			code_number(INVOKESTATIC, 1);
+//			code_number(findMethodRef(FLOATTy,false), 2);
+//		}
+//		else if(strcmp(expr->left->idlist->begin->name,"readLine") == 0)
+//		{
+//			code_number(INVOKESTATIC, 1);
+//			code_number(findMethodRef(VT_STRING,false), 2);
+//		}
+//		else if(strcmp(expr->left->idlist->begin->name,"print") == 0)
+//		{
+//			generate_expr_list_code(expr->right->idlist);
+//			code_number(INVOKESTATIC, 1);
+//
+//  	char * str = (char*)malloc(sizeof(char)*33);
+//
+//			if(expr->right->idlist->begin->type == ET_ID_LIST) {
+//				LocalVariable el;
+//				el =  is_in_local_vars(expr->right->idlist->begin->idlist->begin->name);
+//							//strcpy(str,update_variable(globalroot,expr->right->idlist->begin));
+//							strcpy(str,Convert_Local_Variable_Type(el));
+//			}
+//				else if (expr->right->idlist->begin->type==ET_MINUS ||expr->right->idlist->begin->type==ET_PLUS || expr->right->idlist->begin->type==ET_MULT || expr->right->idlist->begin->type==ET_DIV || expr->right->idlist->begin->type==EXPR_MOD){
+//							strcpy(str,check_stack_operation(create_stack_operation(expr->right->idlist->begin)));
+//						}
+//						else if(expr->right->idlist->begin->type == EXPR_MAS){
+//							LocalVariable el;
+//							el =  is_in_local_vars(expr->right->idlist->begin->left->idlist->begin->name);
+//							strcpy(str,Convert_Local_Variable_Type(el));
+//						}
+//						else{
+//							strcpy(str, return_Expr_Init_Type(expr->right->idlist->begin));
+//						}
+//
+//						int i = 0;
+//
+//						if(strlen(str) > 2){
+//								i = 1;
+//							}
+//							printf("case 'I':    code_number(findMethodRef(VT_INTEGER,true), 2);     break; %s\n",str);
+//			switch (str[i]) {
+//			case 'I':    code_number(findMethodRef(VT_INTEGER,true), 2);     break;
+//			case 'F':    code_number(findMethodRef(FLOATTy,true), 2);   break;
+//			case 'D':    code_number(findMethodRef(VT_FLOAT,true), 2);  break;
+//			case 'B':    code_number(findMethodRef(VT_BOOLEAN,true), 2);    break;
+//			case 'S':    code_number(findMethodRef(VT_STRING,true), 2);  break;
+//			case 'A':    code_number(findMethodRef(VT_ARRAY,true), 2);   break;
+//			default:          printf("DEFAULT %s\n",str);   code_number(findMethodRef(VT_ARRAY,true), 2);    break;
+//			}
+//
+//
+//		}
+//		else {
+//
+//				generate_expr_list_code(expr->right->idlist);
+//
+//					int count = 0;
+//					for (auto c : main_functions_list) {
+//					        if (strcmp(c.name->last->name, expr->left->idlist->begin->name) == 0)
+//					        {
+//										break;
+//					        }
+//									count = count + 1;
+//					     }
+//							 printf("descriptor_of_methods[count] -> %d\n",descriptor_of_methods[count]);
+//					code_number(INVOKESTATIC, 1);
+//					code_number(descriptor_of_methods[count] + 2 , 2);
+//
+//			}
+//
+//			break;
+//		}
 
-
-			if (currentElem != NULL)
-			{
-				for (int i = 0; i < size; i++)
-				{
-
-					code_number(DUP, 1);
-					code_number(SIPUSH, 1);
-					code_number(i, 2);
-					generate_expr_code(currentElem->value);
-//					if (expr->vartype->type == ARRAYINTTy)
-//					code_number(IASTORE, 1);
-//					else if (expr->vartype->type == ARRAYDOUBLETy || expr->vartype->type  == ARRAYFLOATTy)
-//						code_number(FASTORE, 1);
-//					else
-					if (expr->vartype->type == BOOLTy)
-						code_number(IASTORE, 1);
-
-					currentElem = currentElem->next;
-				}
-			}
-
-
-		}
-
-
-		break;
-	}
-
-	case EXPR_MET:
-	{
-
-		if(expr->left->idlist->first->next != NULL)
-		{
-			if(strcmp(expr->left->idlist->first->next->name,"count") == 0)
-			{
-
-
-				LocalVariable el;
-				el =  is_in_local_vars(expr->left->idlist->first->name);
-				if(strcmp(el.FunctionName,"Main")==0){
-					code_number(GETSTATIC, 1);
-					code_number(el.id - 1,2);
-				}
-				else{
-				code_number(ALOAD, 1);
-				printf("el.id %d",el.id);
-				code_number(el.id, 1);
-				}
-
-				code_number(ARRAYLENGTH,1);
-				return;
-			}
-		}
-		else if(strcmp(expr->left->idlist->first->name,"toInt") == 0)
-		{
-			generate_expr_list_code(expr->right->idlist);
-			code_number(INVOKESTATIC, 1);
-			code_number(findMethodRef(INTTy,false), 2);
-		}
-		else if(strcmp(expr->left->idlist->first->name,"toFloat") == 0)
-		{
-			generate_expr_list_code(expr->right->idlist);
-			code_number(INVOKESTATIC, 1);
-			code_number(findMethodRef(FLOATTy,false), 2);
-		}
-		else if(strcmp(expr->left->idlist->first->name,"readLine") == 0)
-		{
-			code_number(INVOKESTATIC, 1);
-			code_number(findMethodRef(STRINGTy,false), 2);
-		}
-		else if(strcmp(expr->left->idlist->first->name,"print") == 0)
-		{
-			generate_expr_list_code(expr->right->idlist);
-			code_number(INVOKESTATIC, 1);
-
-  	char * str = (char*)malloc(sizeof(char)*33);
-
-			if(expr->right->idlist->first->type == EXPR_ID_LIST) {
-				LocalVariable el;
-				el =  is_in_local_vars(expr->right->idlist->first->idlist->first->name);
-							//strcpy(str,update_variable(globalroot,expr->right->idlist->first));
-							strcpy(str,Convert_Local_Variable_Type(el));
-			}
-				else if (expr->right->idlist->first->type==EXPR_MINUS ||expr->right->idlist->first->type==EXPR_PLUS || expr->right->idlist->first->type==EXPR_MUL || expr->right->idlist->first->type==EXPR_DIV || expr->right->idlist->first->type==EXPR_MOD){
-							strcpy(str,check_stack_operation(create_stack_operation(expr->right->idlist->first)));
-						}
-						else if(expr->right->idlist->first->type == EXPR_MAS){
-							LocalVariable el;
-							el =  is_in_local_vars(expr->right->idlist->first->left->idlist->first->name);
-							strcpy(str,Convert_Local_Variable_Type(el));
-						}
-						else{
-							strcpy(str, return_Expr_Init_Type(expr->right->idlist->first));
-						}
-
-						int i = 0;
-
-						if(strlen(str) > 2){
-								i = 1;
-							}
-							printf("case 'I':    code_number(findMethodRef(INTTy,true), 2);     break; %s\n",str);
-			switch (str[i]) {
-			case 'I':    code_number(findMethodRef(INTTy,true), 2);     break;
-			case 'F':    code_number(findMethodRef(FLOATTy,true), 2);   break;
-			case 'D':    code_number(findMethodRef(DOUBLETy,true), 2);  break;
-			case 'B':    code_number(findMethodRef(BOOLTy,true), 2);    break;
-			case 'S':    code_number(findMethodRef(STRINGTy,true), 2);  break;
-			case 'A':    code_number(findMethodRef(ARRAYTy,true), 2);   break;
-			default:          printf("DEFAULT %s\n",str);   code_number(findMethodRef(ARRAYTy,true), 2);    break;
-			}
-
-
-		}
-		else {
-
-				generate_expr_list_code(expr->right->idlist);
-
-					int count = 0;
-					for (auto c : main_functions_list) {
-					        if (strcmp(c.name->last->name, expr->left->idlist->first->name) == 0)
-					        {
-										break;
-					        }
-									count = count + 1;
-					     }
-							 printf("discriptor_of_methods[count] -> %d\n",discriptor_of_methods[count]);
-					code_number(INVOKESTATIC, 1);
-					code_number(discriptor_of_methods[count] + 2 , 2);
-
-			}
-
-			break;
-		}
-
-	case EXPR_PLUS:
+	case ET_PLUS:
 		{
 			generate_expr_code(expr->left);
 			generate_expr_code(expr->right);
@@ -837,11 +838,11 @@ void generate_expr_code(Expression *expr)
 			case 'D':    code_number(DADD, 1);  break;
 			case 'S':			code_number(INVOKESTATIC, 1);
 										code_number(61,2);break;
-			default:          printf("==WTF?== IN EXPR_PLUS\n");   code_number(IADD, 1);      break;
+			default:          printf("==WTF?== IN ET_PLUS\n");   code_number(IADD, 1);      break;
 			}
 			break;
 		}
-	case EXPR_MUL:
+	case ET_MULT:
 		{
 			generate_expr_code(expr->left);
 			generate_expr_code(expr->right);
@@ -849,11 +850,11 @@ void generate_expr_code(Expression *expr)
 			case 'I':    code_number(IMUL, 1);     break;
 			case 'F':    code_number(FMUL, 1);   break;
 			case 'D':    code_number(DMUL, 1);  break;
-			default:          printf("==WTF?== IN EXPR_MUL %s \n",check_stack_operation(create_stack_operation(expr)));  code_number(IMUL, 1);      break;
+			default:          printf("==WTF?== IN ET_MULT %s \n",check_stack_operation(create_stack_operation(expr)));  code_number(IMUL, 1);      break;
 			}
 			break;
 		}
-	case EXPR_DIV:
+	case ET_DIV:
 		{
 			generate_expr_code(expr->left);
 			generate_expr_code(expr->right);
@@ -861,11 +862,11 @@ void generate_expr_code(Expression *expr)
 			case 'I':    code_number(IDIV, 1);     break;
 			case 'F':    code_number(FDIV, 1);   break;
 			case 'D':    code_number(DDIV, 1);  break;
-			default:          printf("==WTF?== EXPR_DIV\n"); code_number(IDIV, 1);       break;
+			default:          printf("==WTF?== ET_DIV\n"); code_number(IDIV, 1);       break;
 			}
 			break;
 		}
-	case EXPR_MINUS:
+	case ET_MINUS:
 		{
 
 			generate_expr_code(expr->left);
@@ -876,12 +877,12 @@ switch (check_stack_operation(create_stack_operation(expr))[0]) {
 case 'I':    code_number(ISUB, 1);     break;
 case 'F':    code_number(FSUB, 1);   break;
 case 'D':    code_number(DSUB, 1);  break;
-default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);      break;
+default:          printf("==WTF?== IN ET_MINUS\n"); code_number(ISUB, 1);      break;
 }
 
 			break;
 		}
-	case EXPR_GT:
+	case ET_GREATER:
 		{
 			generate_expr_code(expr->left);
 			generate_expr_code(expr->right);
@@ -893,7 +894,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_EQ:
+	case ET_EQUAL:
 		{
 			generate_expr_code(expr->right);
 			generate_expr_code(expr->left);
@@ -907,7 +908,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_LT:
+	case ET_LESSER:
 		{
 			generate_expr_code(expr->left);
 			generate_expr_code(expr->right);
@@ -919,7 +920,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_NOT:
+	case ET_NOT:
 		{
 			generate_expr_code(expr->left);
 			code_number(ICONST_0, 1);
@@ -931,7 +932,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_NQ:
+	case ET_NOT_EQUAL:
 		{
 			generate_expr_code(expr->right);
 			generate_expr_code(expr->left);
@@ -943,7 +944,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_GE:
+	case ET_GREATER_EQUAL:
 		{
 			generate_expr_code(expr->right);
 			generate_expr_code(expr->left);
@@ -955,7 +956,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_LE:
+	case ET_LESSER_EQUAL:
 		{
 			generate_expr_code(expr->right);
 			generate_expr_code(expr->left);
@@ -967,7 +968,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_1, 1);
 			break;
 		}
-	case EXPR_AND:
+	case ET_LOGIC_AND:
 		{
 			auto temp_vector = all_code;
 
@@ -1008,7 +1009,7 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			code_number(ICONST_0, 1);
 			break;
 		}
-	case EXPR_OR:
+	case ET_LOGIC_OR:
 		{
 			auto temp_vector = all_code;
 
@@ -1052,55 +1053,55 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 			break;
 		}
 
-	case EXPR_UMIN:
-		{
-			if (expr->type == INTTy || expr->type == EXPR_INT)
-			{
-				code_number(BIPUSH, 1);
-				code_number(0, 1);
-				generate_expr_code(expr->left);
-				code_number(ISUB, 1);
-			}
-			else
-			{
-				code_number(FCONST_0, 1);
-				generate_expr_code(expr->left);
-				code_number(FSUB, 1);
-			}
-			break;
-		}
-	case EXPR_INT:
+//	case EXPR_UMIN:
+//		{
+//			if (expr->type == VT_INTEGER || expr->type == ET_INTEGER)
+//			{
+//				code_number(BIPUSH, 1);
+//				code_number(0, 1);
+//				generate_expr_code(expr->left);
+//				code_number(ISUB, 1);
+//			}
+//			else
+//			{
+//				code_number(FCONST_0, 1);
+//				generate_expr_code(expr->left);
+//				code_number(FSUB, 1);
+//			}
+//			break;
+//		}
+	case ET_INTEGER:
 		{
 			code_number(LDC, 1);
 			code_number(expr->id, 1);
 			break;
 		}
-	case EXPR_DOUBLE:
-		{
-			code_number(LDC_W, 1);
-			code_number(expr->id, 2);
-
-/*
-			code_number(INVOKESTATIC, 1);
-			code_number(65, 2);
-			*/
-			break;
-		}
-		case EXPR_FLOAT:
+//	case EXPR_DOUBLE:
+//		{
+//			code_number(LDC_W, 1);
+//			code_number(expr->id, 2);
+//
+///*
+//			code_number(INVOKESTATIC, 1);
+//			code_number(65, 2);
+//			*/
+//			break;
+//		}
+		case ET_FLOAT:
 			{
 				code_number(LDC_W, 1);
 				code_number(expr->id, 2);
 				break;
 			}
-	case EXPR_STR:
+	case ET_STRING:
 		{
 			code_number(LDC, 1);
 			code_number(expr->id, 1);
 			break;
 		}
-	case EXPR_BOOL:
+	case ET_BOOL:
 		{
-			if (expr->Int)
+			if (expr->val.int_val)
 				code_number(ICONST_1, 1);
 			else
 				code_number(ICONST_0, 1);
@@ -1109,9 +1110,9 @@ default:          printf("==WTF?== IN EXPR_MINUS\n"); code_number(ISUB, 1);     
 
 	}
 
-	if (expr->next != NULL && !arrInitializing)
+	if (expr->nextInList != NULL && !arrInitializing)
 	{
-		generate_expr_code(expr->next);
+		generate_expr_code(expr->nextInList);
 	}
 
 }
@@ -1121,8 +1122,8 @@ void generate_expr_list_code(ExpressionList *list)
 
 	if(list!=NULL)
 	{
-		if(list->first != NULL)
-		generate_expr_code(list->first);
+		if(list->begin != NULL)
+		generate_expr_code(list->begin);
 	}
 
 }
@@ -1132,7 +1133,7 @@ void generate_varlist_code(ExpressionList*list)
 
 	if(list!=NULL)
 	{
-		generate_var_code(list->first);
+		generate_var_code(list->begin);
 	}
 
 }
@@ -1143,16 +1144,16 @@ void generate_var_code(Expression*var)
 	if (var != NULL)
 	{
 		generate_expr_code(var);
-		LocalVariable local = is_in_local_vars(var->name);
+		LocalVariable local = is_in_local_vars(var->val.string_val);
 		if(local.name != NULL  || local.id != -1)
 		{
 			code_number(ASTORE, 1);
 			code_number(local.id, 1);
 		}
 	}
-	if(var->next != NULL)
+	if(var->nextInList != NULL)
 	{
-		generate_var_code(var->next);
+		generate_var_code(var->nextInList);
 	}
 
 }
@@ -1164,10 +1165,10 @@ void generate_name_code(Expression*name)
 		int i;
 		for (i = 0; i < loopVarNames.size(); i++)
 		{
-				if (loopVarName != NULL && strcmp(name->name, loopVarNames[i]) == 0)
+				if (loopVarName != NULL && strcmp(name->val.string_val, loopVarNames[i]) == 0)
 				break;
 		}
-		if (loopVarName!=NULL && i<loopVarNames.size() && strcmp(name->name, loopVarNames[i]) == 0)
+		if (loopVarName!=NULL && i<loopVarNames.size() && strcmp(name->val.string_val, loopVarNames[i]) == 0)
 		{
 			code_number(ILOAD, 1);
 			code_number(List_of_variable.size() + i + 1 , 1);
@@ -1175,7 +1176,7 @@ void generate_name_code(Expression*name)
 		else
 		{
 
-			LocalVariable elem = is_in_local_vars(name->name);
+			LocalVariable elem = is_in_local_vars(name->val.string_val);
 
 			if(strcmp(elem.FunctionName, "Main") == 0){
 				code_number(GETSTATIC, 1);
@@ -1183,33 +1184,33 @@ void generate_name_code(Expression*name)
 				return;
 			}
 
-			if (elem.varType == INTTy )
+			if (elem.varType == VT_INTEGER )
 			{
 				code_number(ILOAD, 1);
 				code_number(elem.id, 1);
 			}
-			else if (elem.varType == BOOLTy)
+			else if (elem.varType == VT_BOOLEAN)
 			{
 				code_number(ILOAD, 1);
 				code_number(elem.id, 1);
 			}
-			else if (elem.varType == DOUBLETy || elem.varType == FLOATTy)
+			else if (elem.varType == VT_FLOAT)
 			{
 				code_number(FLOAD, 1);
 				code_number(elem.id, 1);
 			}
-			else if (elem.varType == STRINGTy)
+			else if (elem.varType == VT_STRING)
 			{
 				code_number(ALOAD, 1);
 				code_number(elem.id, 1);
 			}
-			else if (elem.varType == ARRAYTy || elem.isArray)
+			else if (elem.varType == VT_ARRAY || elem.isArray)
 			{
 				code_number(ALOAD, 1);
 				code_number(elem.id, 1);
 			}
 		}
-		generate_name_code(name->next);
+		generate_name_code(name->nextInList);
 	}
 
 }
@@ -1219,7 +1220,7 @@ void generate_name_list_code(ExpressionList*list)
 {
 	if(list!=NULL)
 	{
-		generate_name_code(list->first);
+		generate_name_code(list->begin);
 	}
 
 }
@@ -1249,9 +1250,9 @@ void generate_if_code(IfStatement * If)
 	jumpHolderPos.push_back(all_code.size());
 	code_number(0, 2);
 
-	generate_stmt_list_code(If->body);
+	generate_stmt_list_code(If->stmtList);
 
-	generate_elsif_list_code(If->elseiflist,jumpHolderPos,posTo);
+	generate_elsif_list_code(If->elseIfStmtList,jumpHolderPos,posTo);
 
 	printf("%d" , elsifCount);
 
@@ -1267,7 +1268,7 @@ void generate_if_code(IfStatement * If)
 		}
 
 
-	if (If->elsebody != NULL)
+	if (If->elseStmt->stmtList != NULL)
 	{
 
 		code_number(GO_TO, 1);
@@ -1276,18 +1277,18 @@ void generate_if_code(IfStatement * If)
 		code_number(0, 2);
 	}
 
-	if (If->elsebody == NULL)
+	if (If->elseStmt->stmtList == NULL)
 	{
 		posTo.push_back(all_code.size());
 	}
- if (If->elsebody != NULL)
+ if (If->elseStmt->stmtList != NULL)
 	{
 	posTo.push_back(all_code.size());
 
-	generate_stmt_list_code(If->elsebody);
+	generate_stmt_list_code(If->elseStmt->stmtList);
 	posTo.push_back(all_code.size());
 
-	if (If->elseiflist != NULL)
+	if (If->elseIfStmtList != NULL)
 	{
 		posTo[posTo.size()   - 2] = jumpHolderPos[jumpHolderPos.size()  - 1]+2;
 	}
@@ -1307,7 +1308,7 @@ void generate_elsif_list_code(ElseIfStatementList *list, std::vector<int> jump ,
 {
 
 	if(list!=NULL)
-		generate_elsif_code(list->first,jump,pos);
+		generate_elsif_code(list->begin->stmtList->begin->stmtVal.ifStmt,jump,pos); //TODO если что удалить
 
 }
 bool newElsif = false;
@@ -1325,23 +1326,23 @@ void generate_elsif_code(IfStatement*elsif, std::vector<int> jump , std::vector<
 	code_number(IFEQ, 1);
 	jump.push_back(all_code.size());
 	code_number(0, 2);
-	generate_stmt_list_code(elsif->body);
+	generate_stmt_list_code(elsif->stmtList);
 	if (!newElsif)
 		pos.push_back(all_code.size());
 
-	if (elsif->next != NULL)
-	{
-		newElsif = true;
-		generate_elsif_code(elsif->next,jump,pos);
-	}
+//	if (elsif->elseIfStmtList != NULL)
+//	{
+//		newElsif = true;
+//		generate_elsif_code(elsif->elseIfStmtList->begin->nextInList,jump,pos);
+//	}
 	newElsif = false;
 }
 
 }
 void generate_stmt_list_code(StatementList *list)
 {
-	if(list->first != NULL){
-	generate_stmt_code(list->first);
+	if(list->begin != NULL){
+	generate_stmt_code(list->begin);
 	}
 }
 
@@ -1350,53 +1351,53 @@ void generate_stmt_code(Statement*stmt)
 	switch (stmt->type)
 	{
 
-	case STMT_ASSIGN:
+	case ST_ASSIGN:
 
 	generate_expr_assign(stmt);
 
 		break;
-	case STMT_EXPR:
+	case ST_EXPRESSION:
 		{
-			generate_expr_code(stmt->expr);
+			generate_expr_code(stmt->stmtVal.exprStmt);
 
 			break;
 		}
-
-	case STMT_FUNC:
+//TODO вынести в отдельный метод
+//	case STMT_FUNC:
+//		{
+//
+//code_of_methods.insert(code_of_methods.end(), std::vector<char>());
+//
+//code_of_methods[0].clear();
+//
+//	for (auto el : all_code)
+//			code_of_methods[0].push_back(el);
+//
+//		all_code.clear();
+//		generate_func_proc_code(stmt->func);
+//
+//			break;
+//		}
+	case ST_IF:
 		{
-
-code_of_methods.insert(code_of_methods.end(), std::vector<char>());
-
-code_of_methods[0].clear();
-
-	for (auto el : all_code)
-			code_of_methods[0].push_back(el);
-
-		all_code.clear();
-		generate_func_proc_code(stmt->func);
-
+			generate_if_code(stmt->stmtVal.ifStmt);
 			break;
 		}
-	case STMT_IF:
+	case ST_FOR:
 		{
-			generate_if_code(stmt->if_tree);
+			generate_for_code(stmt->stmtVal.forStmt);
 			break;
 		}
-	case STMT_FOR:
+	case ST_WHILE:
 		{
-			generate_for_code(stmt->for_loop);
+			generate_while_code(stmt->stmtVal.whileStmt);
 			break;
 		}
-	case STMT_WHILE:
+	case ST_RETURN:
 		{
-			generate_while_code(stmt->while_loop);
-			break;
-		}
-	case STMT_RETURN:
-		{
-				generate_expr_code(stmt->expr);
+				generate_expr_code(stmt->stmtVal.exprStmt);
 
-				switch (update_variable(globalroot,stmt->expr)[0]) {
+				switch (update_variable(globalroot,stmt->stmtVal.exprStmt)[0]) {
 				case 'I':    code_number(IRETURN, 1);     break;
 				case 'B': 	 code_number(IRETURN, 1); break;
 				case 'F':    code_number(FRETURN, 1);   break;
@@ -1412,13 +1413,28 @@ code_of_methods[0].clear();
 		}
 
 	}
-	if (stmt->next != NULL)
+	if (stmt->nextInList != NULL)
 	{
-		generate_stmt_code(stmt->next);
+		generate_stmt_code(stmt->nextInList);
 	}
 
 }
 
+void generate_program_unit(Program *root) {
+code_of_methods.insert(code_of_methods.end(), std::vector<char>());
+
+code_of_methods[0].clear();
+
+	for (auto el : all_code) {
+				code_of_methods[0].push_back(el);
+
+    		all_code.clear();
+    		generate_func_proc_code(root);
+
+    			break;
+
+	}
+}
 void generate_func_proc_code(Program *func)
 {
 code_of_methods.insert(code_of_methods.end(), std::vector<char>());
@@ -1427,11 +1443,11 @@ code_of_methods.insert(code_of_methods.end(), std::vector<char>());
 	int temploop = loopCounter;
 	loopCounter = 0;
 
-if(func->args != NULL){
-	generate_expr_list_code(func->args);
+if(func->locals_list != NULL){
+	generate_expr_list_code(func->locals_list); //TODO locals_list наверное не то, нужен аналог struct NExprList* args;
 }
 
-	generate_stmt_list_code(func->body);
+	generate_stmt_list_code(func->performSection);
 
 		if(!funcReturn)
 		code_number(_RETURN, 1);
@@ -1452,48 +1468,48 @@ void generate_while_code(WhileStatement * While)
 	int startCondition;
 	union s2 temp;
 
-	if (!While->doWhile)
-	{
+//	if (!While->doWhile)
+//	{
 		code_number(GO_TO, 1);
 		code_number(0, 2);
-	}
+//	}
 	size = all_code.size();
 
-	generate_stmt_list_code(While->body);
+	generate_stmt_list_code(While->whileBlock);
 	size2 = all_code.size();
 
 
 	generate_expr_code(While->condition);
 
 
-	if (!While->doWhile)
-	{
+//	if (!While->doWhile)
+//	{
 		temp = make_reversed_s2(size2 - size + 3);
 		for (int i = 0; i < 2; i++)
 			all_code.at(size - 2 + i) = temp.bytes[i];
-	}
+//	}
 
-	if (!While->doWhile)
-	{
+//	if (!While->doWhile)
+//	{
 		code_number(IFNE, 1);
 		temp = make_reversed_s2(size + 1 - all_code.size());
 		for (int i = 0; i < 2; i++)
 			all_code.push_back(temp.bytes[i]);
-	}
-	else
-	{
-		code_number(IFEQ, 1);
-		temp = make_reversed_s2(size + 1 - all_code.size());
-		for (int i = 0; i < 2; i++)
-			all_code.push_back(temp.bytes[i]);
-	}
+//	}
+//	else
+//	{
+//		code_number(IFEQ, 1);
+//		temp = make_reversed_s2(size + 1 - all_code.size());
+//		for (int i = 0; i < 2; i++)
+//			all_code.push_back(temp.bytes[i]);
+//	}
 
 }
 void generate_for_code(ForStatement *For)
 {
 
-	loopVarName = (char*)malloc(sizeof(char) * strlen(For->name->name)+1);
-	loopVarName = For->name->name;
+	loopVarName = (char*)malloc(sizeof(char) * strlen(For->iterID)+1);
+	loopVarName = For->iterID;
 	loopVarNames.push_back(loopVarName);
 	loopCounter++;
 	int currentFor = loopCounter;
@@ -1503,7 +1519,7 @@ void generate_for_code(ForStatement *For)
 	union s2 temp;
 
 
-		generate_expr_code(For->start->left );
+		generate_expr_code(For->range->startIndex->left );
 		code_number(ISTORE, 1);
 		code_number(List_of_variable.size() + currentFor, 1);
 
@@ -1512,7 +1528,7 @@ void generate_for_code(ForStatement *For)
 		size = all_code.size();
 
 
-		generate_stmt_list_code(For->body );
+		generate_stmt_list_code(For->stmtList );
 		code_number(ILOAD, 1);
 		code_number(List_of_variable.size() + currentFor, 1);
 		code_number(ICONST_1, 1);
@@ -1526,7 +1542,7 @@ void generate_for_code(ForStatement *For)
 
 		code_number(ILOAD, 1);
 		code_number(List_of_variable.size() + currentFor, 1);
-		generate_expr_code(For->start->right);
+		generate_expr_code(For->range->startIndex->right);
 		code_number(IF_ICMPLT, 1);
 		code_number(7, 2);
 		code_number(ICONST_0, 1);
@@ -1565,8 +1581,8 @@ void generate_arr_var_code(Expression * var)
 
 	if (var!= NULL)
 	{
-		generate_expr_list_code(var->idlist);
-		LocalVariable local = is_in_local_vars(var->name);
+		generate_expr_list_code(var->exprList);
+		LocalVariable local = is_in_local_vars(var->val.string_val);
 		if(local.name != NULL  || local.id != -1)
 		{
 			code_number(ASTORE, 1);
@@ -1576,23 +1592,7 @@ void generate_arr_var_code(Expression * var)
 
 }
 
-void generate_return_code(NVarEnumType type)
-{
-	if (type == STRINGTy || type == ARRAYTy)
-	{
-		code_number(ARETURN, 1);
-	}
-	else if (type == INTTy || type == CHARACTERTy || type == BOOLTy)
-	{
-		code_number(IRETURN, 1);
-	}
-	else if (type == DOUBLETy || type == FLOATTy)
-	{
-		code_number(FRETURN, 1);
-	}
-}
-
-void generate_byte_code()
+void generate_byte_code(ProgramList *root)
 {
 
 printf("count of List_of_variable: %d\n", List_of_variable.size());
@@ -1600,7 +1600,7 @@ for (auto c : List_of_variable) {
 	printf("name -> %s , id -> %d , type -> %d \n",c.name, c.id , c.varType);
 }
 generation = true;
-generate_stmt_list_code(root);
+generate_program_unit(root->begin);
 byte_code = all_code;
 	generate_class_file();
 
