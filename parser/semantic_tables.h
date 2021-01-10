@@ -109,7 +109,7 @@ char * get_function_args(struct Program * f);
 char * update_variable(ProgramList *root,Expression *var);
 void mult_declaration(StatementList *root,Expression *var);
 //void process_functions(struct ProgramList * node);
-void collect_functions(struct ProgramList * node);
+void get_compilation_unit(struct ProgramList * node);
 //void recursive_collect_inner_functions(struct Program * node);
 void printTable();
 char * return_Expr_Init_Type(Expression *var);
@@ -1500,23 +1500,14 @@ void print_function_param(char * function, StatementList *root){
 }
 
 //DONE
-void collect_functions(struct ProgramList *node)
+void get_compilation_unit(struct ProgramList *node)
 {
 	struct Program *current = node->begin;
-	while (current != NULL)
-	{
-		for (auto c: main_functions_list)	//тут лежит контейнер с Program
-		{
-			if (strcmp(c.id, current->id) == 0)
-			{
-				printf("Redefine function\n");
-				exit(EXIT_FAILURE);
-			}
-		}
+	main_functions_list.push_back(*current);
 
-		main_functions_list.push_back(*current);
-
-		current = current->nextInList;
+	if (current->nextInList != NULL) {
+        printf("File can have only one compilation unit\n");
+        exit(EXIT_FAILURE);
 	}
 }
 
@@ -1604,32 +1595,29 @@ void create_table(ProgramList *root){
 
         globalroot = root;
 
-        collect_functions(globalroot);
+        get_compilation_unit(globalroot);
 
         struct Program * current = root->begin;
 
-//        while (current != NULL) {
-//            struct Statement * currentStmt = current->performSection->begin;
+        if (current != NULL) {
+            if (current->performSection != NULL) {
+                struct Statement * currentStmt = current->performSection->begin;
 
-//            while (currentStmt != NULL) {
-//                st_stmt(currentStmt);
-//                if(currentStmt != currentStmt->nextInList) {
-//                   currentStmt->nextInList;
-//                } else {
-//                   currentStmt = NULL;
-//                }
-//                printf("curSTMT %d \n",current);
-//            }
+                while (currentStmt != NULL) {
+                    st_stmt(currentStmt);
+                    currentStmt = currentStmt->nextInList;
+                }
+            }
 
-//            struct DeclarationStatement * currentDeclStmt = current->declarationSection->begin;
-//
-//            while (currentDeclStmt != NULL) {
-//                dec_decl(currentDeclStmt);
-//                currentDeclStmt->nextInList;
-//            }
-//
-//            current = current->nextInList;
-//        }
+            if (current->declarationSection != NULL) {
+                struct DeclarationStatement * currentDeclStmt = current->declarationSection->begin;
+
+                while (currentDeclStmt != NULL) {
+                    dec_decl(currentDeclStmt);
+                    currentDeclStmt = currentDeclStmt->nextInList;
+                }
+            }
+        }
 
         printTable();
         printLocalVars();
@@ -1642,29 +1630,8 @@ void create_table(ProgramList *root){
             exit(EXIT_FAILURE);
           }
         }
-
-        for(auto s: main_functions_list){
-
-        if(!check_return_function(s.performSection,get_function_type(&s)))
-        {
-                printf("Return doesnot exist or wrong return value\n");
-                exit(EXIT_FAILURE);
-        }
-      }
 }
 
-//void create_main_table(StatementList *root){
-//        struct Statement * current = root->begin;
-//        while (current != NULL) {
-//
-//                if (current->type == ST_ASSIGN/* && current->type == STMT_LASSIGN*/) {
-//
-//                        st_stmt_expr(current->var);
-//                        st_stmt_expr(current->expr);
-//                }
-//                current = current->next;
-//        }
-//}
 //############################################################################//
 void st_stmt_list(struct StatementList * node) {
         struct Statement * current = node->begin;
@@ -1675,7 +1642,7 @@ void st_stmt_list(struct StatementList * node) {
 }
 
 void st_stmt(struct Statement * node) {
-  printf("node->type ->type %d \n",node->type);
+  printf("node->type %d \n",node->type);
         switch (node->type) {
         case ST_WHILE:  st_stmt_while(node->stmtVal.whileStmt);                  break;
         case ST_FOR:    st_stmt_for(node->stmtVal.forStmt);                      break;

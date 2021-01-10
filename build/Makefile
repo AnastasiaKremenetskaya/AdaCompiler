@@ -10,7 +10,7 @@ ada.tab.c:
 	bison -d --report=state ../parser/ada.y
 
 lex.yy.o: lex.yy.c
-	clang -c lex.yy.c
+	clang++ -c lex.yy.c
 
 lex.yy.c:
 	flex ../lexer/ada.yy
