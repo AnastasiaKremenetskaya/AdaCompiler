@@ -256,7 +256,8 @@ return_statement : RETURN expression ';'	{$$ = createStatement(ST_RETURN, (stmtV
 empty_statement : NIL ';'	{$$ = createStatement(ST_NULL, (stmtValue){});}
 				;
 
-expression_list : expression		{$$ = createExpressionList($1);}
+expression_list : 	/* empty */ 	{$$ = NULL;}
+				| expression		{$$ = createExpressionList($1);}
 				| expression_list ',' expression {$$ = appendExpressionToList($1,$3);}
 				;
 
