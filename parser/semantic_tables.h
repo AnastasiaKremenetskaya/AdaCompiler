@@ -1228,7 +1228,7 @@ char * get_function_type(struct Program * f){
 }
 void check_function_args(struct Expression * cur){
 
-        if (strcmp(cur->left->exprList->begin->val.string_val, "print") == 0 || strcmp(cur->left->exprList->begin->val.string_val, "toInt") == 0  ||  strcmp(cur->left->exprList->begin->val.string_val, "toFloat") == 0)
+        if (strcmp(cur->left->exprList->begin->val.string_val, "Put_Line") == 0 || strcmp(cur->left->exprList->begin->val.string_val, "toInt") == 0  ||  strcmp(cur->left->exprList->begin->val.string_val, "toFloat") == 0)
         {
                 if(cur->right->exprList->begin != NULL) {
                         if(cur->right->exprList->begin->type==ET_MINUS ||cur->right->exprList->begin->type==ET_PLUS || cur->right->exprList->begin->type==ET_MULT || cur->right->exprList->begin->type==ET_DIV/* || cur->right->exprList->begin->type==EXPR_MOD*/)
@@ -2387,7 +2387,7 @@ char * st_type_name(enum st_const_types type, char name[10]) {
 //DONE
 void printLocalVars(){
 
-        printf("Method list size = %d\n",functions_list.size() + main_functions_list.size());
+        printf("Program list size = %d\n",functions_list.size() + main_functions_list.size());
         for (auto t : main_functions_list) {
                 printf("%s:\n",t.id);
         }
@@ -2398,7 +2398,7 @@ void printLocalVars_file(FILE *output){
         list<st_const> tempTable;
         tempTable = table;
         int index = 1;
-        fprintf(output,"Method list size = %d\n",functions_list.size());
+        fprintf(output,"Subprogram list size = %d\n",functions_list.size());
         for (auto t : functions_list) {
                 table.clear();
 
